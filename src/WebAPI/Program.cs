@@ -1,4 +1,9 @@
+using Forum.Infrastructure;
+using Forum.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -11,6 +16,8 @@ builder.Services.AddCors(opt => opt.AddPolicy(name: "FreeCorsPolicy",cfg =>
 }));
 
 var app = builder.Build();
+
+await app.InitialiseDatabaseAsync();
 
 if (app.Environment.IsDevelopment())
 {
