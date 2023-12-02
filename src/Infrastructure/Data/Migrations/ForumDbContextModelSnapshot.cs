@@ -22,6 +22,34 @@ namespace Forum.Infrastructure.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Forum.Domain.Entities.ForumEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParentForumId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentForumId");
+
+                    b.ToTable("Forums");
+                });
+
             modelBuilder.Entity("Forum.Domain.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -30,13 +58,71 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.Topic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ParentForumId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TopicName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages");
+                    b.HasIndex("ParentForumId");
+
+                    b.ToTable("Topics");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.UserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IdentityUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityUserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Forum.Infrastructure.Identity.User", b =>
@@ -90,6 +176,9 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -237,6 +326,44 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Forum.Domain.Entities.ForumEntity", b =>
+                {
+                    b.HasOne("Forum.Domain.Entities.ForumEntity", null)
+                        .WithMany("Subforums")
+                        .HasForeignKey("ParentForumId");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("Forum.Domain.Entities.Topic", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Forum.Domain.Entities.UserProfile", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.Topic", b =>
+                {
+                    b.HasOne("Forum.Domain.Entities.ForumEntity", null)
+                        .WithMany("Topics")
+                        .HasForeignKey("ParentForumId");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.UserProfile", b =>
+                {
+                    b.HasOne("Forum.Infrastructure.Identity.User", null)
+                        .WithOne("UserProfile")
+                        .HasForeignKey("Forum.Domain.Entities.UserProfile", "IdentityUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -285,6 +412,29 @@ namespace Forum.Infrastructure.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.ForumEntity", b =>
+                {
+                    b.Navigation("Subforums");
+
+                    b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.Topic", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Forum.Domain.Entities.UserProfile", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Forum.Infrastructure.Identity.User", b =>
+                {
+                    b.Navigation("UserProfile")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

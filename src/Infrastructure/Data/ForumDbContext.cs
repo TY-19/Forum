@@ -12,7 +12,10 @@ public class ForumDbContext : IdentityDbContext<User>, IForumDbContext
     public ForumDbContext(DbContextOptions<ForumDbContext> options) : base(options)
     {
     }
+    public DbSet<ForumEntity> Forums => Set<ForumEntity>();
+    public DbSet<Topic> Topics => Set<Topic>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

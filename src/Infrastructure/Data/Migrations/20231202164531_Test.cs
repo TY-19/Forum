@@ -30,6 +30,7 @@ namespace Forum.Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserProfileId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -51,16 +52,24 @@ namespace Forum.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "Forums",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentForumId = table.Column<int>(type: "int", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_Forums", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Forums_Forums_ParentForumId",
+                        column: x => x.ParentForumId,
+                        principalTable: "Forums",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -169,6 +178,73 @@ namespace Forum.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserProfiles_AspNetUsers_IdentityUserId",
+                        column: x => x.IdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Topics",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TopicName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentForumId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Topics", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Topics_Forums_ParentForumId",
+                        column: x => x.ParentForumId,
+                        principalTable: "Forums",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TopicId = table.Column<int>(type: "int", nullable: false),
+                    UserProfileId = table.Column<int>(type: "int", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Modified = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalTable: "Topics",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Messages_UserProfiles_UserProfileId",
+                        column: x => x.UserProfileId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -207,6 +283,32 @@ namespace Forum.Infrastructure.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Forums_ParentForumId",
+                table: "Forums",
+                column: "ParentForumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_TopicId",
+                table: "Messages",
+                column: "TopicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_UserProfileId",
+                table: "Messages",
+                column: "UserProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Topics_ParentForumId",
+                table: "Topics",
+                column: "ParentForumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfiles_IdentityUserId",
+                table: "UserProfiles",
+                column: "IdentityUserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -232,6 +334,15 @@ namespace Forum.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Topics");
+
+            migrationBuilder.DropTable(
+                name: "UserProfiles");
+
+            migrationBuilder.DropTable(
+                name: "Forums");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

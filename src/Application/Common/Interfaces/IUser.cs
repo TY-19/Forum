@@ -1,4 +1,6 @@
-﻿namespace Forum.Application.Common.Interfaces;
+﻿using Forum.Domain.Entities;
+
+namespace Forum.Application.Common.Interfaces;
 
 public interface IUser
 {

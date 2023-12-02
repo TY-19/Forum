@@ -5,10 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Forum.Infrastructure.Data.Configurations;
 
-public class MessageConfiguration : IEntityTypeConfiguration<Message>
+public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 {
-    public void Configure(EntityTypeBuilder<Message> builder)
+    public void Configure(EntityTypeBuilder<UserProfile> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.HasMany(x => x.Messages)
+            .WithOne()
+            .HasForeignKey(m => m.UserProfileId);
     }
 }
