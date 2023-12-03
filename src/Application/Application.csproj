@@ -17,8 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Mappings\" />
-    <Folder Include="Common\Models\" />
+    <Folder Include="Forums\Commands\CreateForum\" />
     <Folder Include="Messages\Commands\CreateMessage\" />
     <Folder Include="Messages\Commands\DeleteMessage\" />
     <Folder Include="Messages\Commands\UpdateMessage\" />

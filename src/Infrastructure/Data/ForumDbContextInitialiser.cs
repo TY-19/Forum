@@ -69,14 +69,14 @@ public class ForumDbContextInitialiser
             }
         }
 
-        if (!_context.Messages.Any())
-        {
-            _context.Messages.Add(new Message
-            {
-                Text = "Test Message"
-            });
+        //if (!_context.Messages.Any())
+        //{
+        //    _context.Messages.Add(new Message
+        //    {
+        //        Text = "Test Message"
+        //    });
 
-            await _context.SaveChangesAsync();
-        }
+        //    await _context.SaveChangesAsync();
+        //}
     }
 }

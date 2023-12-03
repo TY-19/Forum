@@ -1,19 +1,14 @@
+using Forum.Application;
 using Forum.Infrastructure;
 using Forum.Infrastructure.Data;
+using Forum.WebAPI;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddCors(opt => opt.AddPolicy(name: "FreeCorsPolicy",cfg => 
-{ 
-    cfg.AllowAnyHeader();
-    cfg.AllowAnyMethod();
-    cfg.WithOrigins("*");
-}));
+builder.Services.AddWebServices();
 
 var app = builder.Build();
 

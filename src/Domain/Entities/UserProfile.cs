@@ -5,5 +5,5 @@ namespace Forum.Domain.Entities;
 public class UserProfile : BaseEntity
 {
     public string IdentityUserId { get; set; } = null!;
-    public IQueryable<Message>? Messages { get; }
+    public IEnumerable<Message> Messages { get; } = new List<Message>();
 }

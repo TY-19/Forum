@@ -2,5 +2,10 @@
 
 GET {{WebAPI_HostAddress}}/api/test
 Accept: application/json
+###
+GET {{WebAPI_HostAddress}}/api/forums
+Accept: application/json
 
 ###
+GET {{WebAPI_HostAddress}}/api/forums/1
+Accept: application/json
