@@ -1,7 +1,7 @@
 ﻿using Forum.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 using Forum.Infrastructure.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Forum.Infrastructure.Data.Configurations;
 

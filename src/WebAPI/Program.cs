@@ -25,5 +25,8 @@ app.MapGet("/api/test", () => new { Response = "The server has returned a result
 app.UseCors("FreeCorsPolicy");
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+app.UseExceptionHandler(_ => { });
+
 app.MapControllers();
 app.Run();

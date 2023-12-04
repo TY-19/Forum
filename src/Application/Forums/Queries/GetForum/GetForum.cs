@@ -1,6 +1,6 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
 using Forum.Application.Common.Mappings;
-using Forum.Application.Common.Models;
+using Forum.Application.Forums.Dtos;
 using MediatR;
 
 namespace Forum.Application.Forums.Queries.GetForum;
@@ -15,23 +15,15 @@ public class GetForumRequestHandler(IForumRepository repository) : IRequestHandl
 {
     public async Task<ForumDto?> Handle(GetForumRequest request, CancellationToken cancellationToken)
     {
-        if (request.ForumId != null)
+        if (request.ForumId == null && request.ParentForumId == null)
         {
-            return (await repository.GetForumByIdAsync((int)request.ForumId))?.ToForumDto();
-        }
-        else
-        {
-            if (request.ParentForumId != null)
+            return new ForumDto()
             {
-                return (await repository.GetForumByIdAsync((int)request.ParentForumId))?.ToForumDto();
-            }
-            else
-            {
-                return new ForumDto()
-                {
-                    Subforums = (await repository.GetForumsByParentIdAsync(request.ParentForumId)).ToSubforumsDto()
-                };
-            }
+                Subforums = (await repository.GetForumsByParentIdAsync(request.ParentForumId, cancellationToken)).ToSubforumsDto()
+            };
         }
+        int id = request.ForumId == null ? (int)request.ParentForumId! : (int)request.ForumId;
+
+        return (await repository.GetForumByIdAsync(id, cancellationToken))?.ToForumDto();
     }
 }

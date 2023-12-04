@@ -1,5 +1,4 @@
-﻿using Forum.Domain.Entities;
-using Forum.Infrastructure.Identity;
+﻿using Forum.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

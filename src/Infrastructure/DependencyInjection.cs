@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Forum.Application.Common.Interfaces;
+using Forum.Infrastructure.Data;
+using Forum.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Forum.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Forum.Application.Common.Interfaces;
-using Forum.Infrastructure.Identity;
 
 namespace Forum.Infrastructure;
 

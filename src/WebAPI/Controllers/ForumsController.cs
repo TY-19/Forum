@@ -1,7 +1,8 @@
-﻿using Forum.Application.Forums.Queries.GetForum;
-using Microsoft.AspNetCore.Mvc;
+﻿using Forum.Application.Forums.Commands.CreateForum;
+using Forum.Application.Forums.Dtos;
+using Forum.Application.Forums.Queries.GetForum;
 using MediatR;
-using Forum.Application.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.WebAPI.Controllers;
 
@@ -10,6 +11,7 @@ namespace Forum.WebAPI.Controllers;
 public class ForumsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ForumDto>>> GetTopLevelForums(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetForumRequest() { ParentForumId = null }, cancellationToken));
@@ -17,8 +19,20 @@ public class ForumsController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ForumDto>>> GetForum(int id, CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetForumRequest() { ForumId = id }, cancellationToken));
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> CreateForum(CreateForumCommand command, CancellationToken cancellationToken)
+    {
+        var createdForum = await mediator.Send(command, cancellationToken);
+        return createdForum == null
+            ? BadRequest()
+            : CreatedAtAction(nameof(GetForum), new { id = createdForum.Id }, createdForum);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Forum.Application.Common.Models;
+﻿namespace Forum.Application.Forums.Dtos;
 
 public class ForumDto
 {

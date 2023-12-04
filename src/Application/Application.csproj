@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.1" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
   </ItemGroup>
@@ -17,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Forums\Commands\CreateForum\" />
+    <Folder Include="Common\Models\" />
     <Folder Include="Messages\Commands\CreateMessage\" />
     <Folder Include="Messages\Commands\DeleteMessage\" />
     <Folder Include="Messages\Commands\UpdateMessage\" />

@@ -1,5 +1,6 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
 using Forum.Infrastructure.Repositories;
+using Forum.WebAPI.Infrastructure;
 
 namespace Forum.WebAPI;
 
@@ -16,6 +17,8 @@ public static class DependencyInjection
             cfg.AllowAnyMethod();
             cfg.WithOrigins("*");
         }));
+
+        services.AddExceptionHandler<CustomExceptionHandler>();
 
         services.AddScoped<IForumRepository, ForumRepository>();
 

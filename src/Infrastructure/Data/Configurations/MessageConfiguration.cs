@@ -1,5 +1,4 @@
 ﻿using Forum.Domain.Entities;
-using Forum.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

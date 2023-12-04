@@ -1,4 +1,4 @@
-﻿using Forum.Application.Common.Models;
+﻿using Forum.Application.Forums.Dtos;
 using Forum.Domain.Entities;
 
 namespace Forum.Application.Common.Mappings;

@@ -1,5 +1,4 @@
 ﻿using Forum.Domain.Common;
-using System.Collections.Generic;
 
 namespace Forum.Domain.Entities;
 
