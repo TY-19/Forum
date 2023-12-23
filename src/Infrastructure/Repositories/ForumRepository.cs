@@ -22,6 +22,7 @@ public class ForumRepository(IForumDbContext context) : IForumRepository
             .Where(f => f.ParentForumId == parentId)
             .Include(f => f.Subforums)
             .Include(f => f.Topics)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
@@ -30,5 +31,11 @@ public class ForumRepository(IForumDbContext context) : IForumRepository
         await context.Forums.AddAsync(forum, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         return forum;
+    }
+
+    public async Task UpdateForumAsync(ForumEntity forum, CancellationToken cancellationToken)
+    {
+        context.Forums.Update(forum);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

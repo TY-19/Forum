@@ -1,4 +1,5 @@
 ﻿using Forum.Application.Forums.Commands.CreateForum;
+using Forum.Application.Forums.Commands.UpdateForum;
 using Forum.Application.Forums.Dtos;
 using Forum.Application.Forums.Queries.GetForum;
 using MediatR;
@@ -34,5 +35,18 @@ public class ForumsController(IMediator mediator) : ControllerBase
         return createdForum == null
             ? BadRequest()
             : CreatedAtAction(nameof(GetForum), new { id = createdForum.Id }, createdForum);
+    }
+
+    [HttpPut]
+    [Route("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateForum(int id, UpdateForumCommand command, CancellationToken cancellationToken)
+    {
+        if(id != command.Id) 
+            return BadRequest();
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Success ? NoContent() : BadRequest(response.Message);
     }
 }
