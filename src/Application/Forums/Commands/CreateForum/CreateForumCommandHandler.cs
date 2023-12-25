@@ -6,15 +6,7 @@ using MediatR;
 
 namespace Forum.Application.Forums.Commands.CreateForum;
 
-public class CreateForumCommand : IRequest<ForumDto?>
-{
-    public string Name { get; set; } = string.Empty;
-    public int? ParentForumId { get; set; }
-    public string? Category { get; set; }
-    public string? Description { get; set; }
-}
-
-public class CreateForumRequestHandler(IForumRepository repository) : IRequestHandler<CreateForumCommand, ForumDto?>
+public class CreateForumCommandHandler(IForumRepository repository) : IRequestHandler<CreateForumCommand, ForumDto?>
 {
     public async Task<ForumDto?> Handle(CreateForumCommand command, CancellationToken cancellationToken)
     {

@@ -38,4 +38,15 @@ public class ForumRepository(IForumDbContext context) : IForumRepository
         context.Forums.Update(forum);
         await context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task DeleteForumAsync(int id, CancellationToken cancellationToken)
+    {
+        var toDelete = await context.Forums.FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
+        
+        if (toDelete == null)
+            return;
+
+        context.Forums.Remove(toDelete);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }

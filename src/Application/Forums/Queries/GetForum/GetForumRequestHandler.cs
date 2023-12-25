@@ -5,12 +5,6 @@ using MediatR;
 
 namespace Forum.Application.Forums.Queries.GetForum;
 
-public class GetForumRequest : IRequest<ForumDto>
-{
-    public int? ForumId { get; set; }
-    public int? ParentForumId { get; set; }
-}
-
 public class GetForumRequestHandler(IForumRepository repository) : IRequestHandler<GetForumRequest, ForumDto?>
 {
     public async Task<ForumDto?> Handle(GetForumRequest request, CancellationToken cancellationToken)

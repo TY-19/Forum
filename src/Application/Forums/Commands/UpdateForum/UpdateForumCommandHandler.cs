@@ -1,27 +1,10 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Application.Common.Mappings;
-using Forum.Application.Forums.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
 
 namespace Forum.Application.Forums.Commands.UpdateForum;
 
-public class UpdateForumCommand : IRequest<UpdateForumResponse>
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public int? ParentForumId { get; set; }
-    public string? Category { get; set; }
-    public string? Description { get; set; }
-}
-
-public class UpdateForumResponse
-{
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-}
-
-public class UpdateForumRequestHandler(IForumRepository repository) : IRequestHandler<UpdateForumCommand, UpdateForumResponse>
+public class UpdateForumCommandHandler(IForumRepository repository) : IRequestHandler<UpdateForumCommand, UpdateForumResponse>
 {
     public async Task<UpdateForumResponse> Handle(UpdateForumCommand command, CancellationToken cancellationToken)
     {
