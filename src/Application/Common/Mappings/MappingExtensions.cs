@@ -1,4 +1,5 @@
 ﻿using Forum.Application.Forums.Dtos;
+using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 
 namespace Forum.Application.Common.Mappings;
@@ -16,7 +17,7 @@ public static class MappingExtensions
             Description = forum.Description,
             Subcategories = forum.Subforums.Select(f => f.Category).Distinct(),
             Subforums = forum.Subforums.ToSubforumsDto(),
-            Topics = forum.Topics.ToTopicsDto()
+            Topics = forum.Topics.ToTopicsForumDto()
         };
     }
 
@@ -57,20 +58,32 @@ public static class MappingExtensions
             yield return forum.ToSubforumDto();
         }
     }
-    public static TopicDto ToTopicDto(this Topic topic)
+    public static TopicForumDto ToTopicForumDto(this Topic topic)
     {
-        return new TopicDto()
+        return new TopicForumDto()
         {
-            TopicName = topic.TopicName,
+            Id = topic.Id,
+            Title = topic.Title,
             ParentForumId = topic.ParentForumId,
             MessagesCount = topic.Messages?.Count() ?? 0
         };
     }
-    public static IEnumerable<TopicDto> ToTopicsDto(this IEnumerable<Topic> topics)
+    public static IEnumerable<TopicForumDto> ToTopicsForumDto(this IEnumerable<Topic> topics)
     {
         foreach (var topic in topics)
         {
-            yield return topic.ToTopicDto();
+            yield return topic.ToTopicForumDto();
         }
+    }
+
+    public static TopicDto ToTopicDto(this Topic topic)
+    {
+        return new TopicDto()
+        {
+            Id = topic.Id,
+            Title = topic.Title,
+            ParentForumId = topic.ParentForumId,
+            Messages = topic.Messages
+        };
     }
 }

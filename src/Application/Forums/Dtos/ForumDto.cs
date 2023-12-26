@@ -9,5 +9,5 @@ public class ForumDto
     public string? Description { get; set; }
     public IEnumerable<string?> Subcategories { get; set; } = new List<string?>();
     public IEnumerable<SubforumDto> Subforums { get; set; } = new List<SubforumDto>();
-    public IEnumerable<TopicDto> Topics { get; set; } = new List<TopicDto>();
+    public IEnumerable<TopicForumDto> Topics { get; set; } = new List<TopicForumDto>();
 }

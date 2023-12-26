@@ -26,11 +26,10 @@ public class ForumRepository(IForumDbContext context) : IForumRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ForumEntity> AddForumAsync(ForumEntity forum, CancellationToken cancellationToken)
+    public async Task AddForumAsync(ForumEntity forum, CancellationToken cancellationToken)
     {
         await context.Forums.AddAsync(forum, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        return forum;
     }
 
     public async Task UpdateForumAsync(ForumEntity forum, CancellationToken cancellationToken)
@@ -42,7 +41,7 @@ public class ForumRepository(IForumDbContext context) : IForumRepository
     public async Task DeleteForumAsync(int id, CancellationToken cancellationToken)
     {
         var toDelete = await context.Forums.FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
-        
+
         if (toDelete == null)
             return;
 

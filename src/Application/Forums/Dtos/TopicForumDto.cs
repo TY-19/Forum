@@ -1,8 +1,9 @@
 ﻿namespace Forum.Application.Forums.Dtos;
 
-public class TopicDto
+public class TopicForumDto
 {
-    public string TopicName { get; set; } = string.Empty;
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
     public int? ParentForumId { get; set; }
     public int MessagesCount { get; set; }
 }

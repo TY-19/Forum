@@ -11,7 +11,8 @@ public class CreateForumCommandHandler(IForumRepository repository) : IRequestHa
     public async Task<ForumDto?> Handle(CreateForumCommand command, CancellationToken cancellationToken)
     {
         ForumEntity forum = ToForumEntity(command);
-        return (await repository.AddForumAsync(forum, cancellationToken))?.ToForumDto();
+        await repository.AddForumAsync(forum, cancellationToken);
+        return forum.ToForumDto();
     }
 
     private static ForumEntity ToForumEntity(CreateForumCommand command)

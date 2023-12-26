@@ -18,11 +18,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Models\" />
     <Folder Include="Messages\Commands\CreateMessage\" />
     <Folder Include="Messages\Commands\DeleteMessage\" />
     <Folder Include="Messages\Commands\UpdateMessage\" />
-    <Folder Include="Messages\Queries\GetMessages\" />
+    <Folder Include="Messages\Dtos\" />
+    <Folder Include="Messages\Queries\GetMessage\" />
+    <Folder Include="Users\Commands\CreateUser\" />
+    <Folder Include="Users\Commands\DeleteUser\" />
+    <Folder Include="Users\Commands\UpdateUser\" />
+    <Folder Include="Users\Dtos\" />
+    <Folder Include="Users\Queries\GetAllUsers\" />
+    <Folder Include="Users\Queries\GetUser\" />
   </ItemGroup>
 
 </Project>

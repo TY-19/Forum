@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddExceptionHandler<CustomExceptionHandler>();
 
         services.AddScoped<IForumRepository, ForumRepository>();
+        services.AddScoped<ITopicRepository, TopicRepository>();
 
         return services;
     }

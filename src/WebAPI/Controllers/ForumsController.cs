@@ -44,7 +44,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdateForum(int id, UpdateForumCommand command, CancellationToken cancellationToken)
     {
-        if(id != command.Id) 
+        if (id != command.Id)
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
@@ -54,7 +54,6 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [HttpDelete]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> DeleteForum(int id, CancellationToken cancellationToken)
     {
         await mediator.Send(new DeleteForumCommand() { Id = id }, cancellationToken);
