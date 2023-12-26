@@ -1,15 +1,29 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Interfaces.Repositories;
+using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Infrastructure.Repositories;
 
-public class TopicRepository(IForumDbContext context) : ITopicRepository
+public class TopicRepository(IForumDbContext context,
+    IMessageRepository messageRepository) : ITopicRepository
 {
     public async Task<Topic?> GetTopicByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await context.Topics.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+    }
+    public async Task<TopicDto?> GetTopicDtoByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await context.Topics.Where(t => t.Id == id)
+            .Select(t => new TopicDto()
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ParentForumId = t.ParentForumId,
+                Messages = messageRepository.GetMessagesDtoOfTopic(t.Id)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
     }
     public async Task AddTopicAsync(Topic topic, CancellationToken cancellationToken)
     {

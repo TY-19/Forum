@@ -16,6 +16,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [HttpGet]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TopicDto>> GetTopic(int forumId, int topicId, CancellationToken cancellationToken)
     {
         var topic = await mediator.Send(new GetTopicRequest() { Id = topicId }, cancellationToken);

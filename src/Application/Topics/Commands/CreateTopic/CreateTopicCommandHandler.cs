@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Application.Common.Mappings;
 using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
@@ -12,6 +11,11 @@ public class CreateTopicCommandHandler(ITopicRepository repository) : IRequestHa
     {
         var topic = new Topic() { Title = command.Title, ParentForumId = command.ParentForumId };
         await repository.AddTopicAsync(topic, cancellationToken);
-        return topic.ToTopicDto();
+        return new TopicDto()
+        {
+            Id = topic.Id,
+            Title = topic.Title,
+            ParentForumId = topic.ParentForumId
+        };
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Forums.Dtos;
-using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 
 namespace Forum.Application.Common.Mappings;
@@ -76,14 +75,4 @@ public static class MappingExtensions
         }
     }
 
-    public static TopicDto ToTopicDto(this Topic topic)
-    {
-        return new TopicDto()
-        {
-            Id = topic.Id,
-            Title = topic.Title,
-            ParentForumId = topic.ParentForumId,
-            Messages = topic.Messages
-        };
-    }
 }

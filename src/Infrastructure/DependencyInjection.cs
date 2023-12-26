@@ -1,4 +1,5 @@
 ﻿using Forum.Application.Common.Interfaces;
+using Forum.Application.Common.Interfaces.Identyty;
 using Forum.Infrastructure.Data;
 using Forum.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -29,10 +30,21 @@ public static class DependencyInjection
         services.AddAuthorizationBuilder();
 
         services
-            .AddIdentityCore<User>()
+            .AddIdentityCore<User>(options =>
+            {
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЇЮЯ";
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit = false;
+            })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ForumDbContext>()
             .AddApiEndpoints();
+
+        services.AddScoped<IUserManager, IdentityUserManager>();
+        services.AddScoped<IRoleManager, IdentityRoleManager>();
 
         //services.AddTransient<IIdentityService, IdentityService>();
 

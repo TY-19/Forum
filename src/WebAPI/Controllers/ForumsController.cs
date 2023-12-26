@@ -14,7 +14,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ForumDto>>> GetTopLevelForums(CancellationToken cancellationToken)
+    public async Task<ActionResult<ForumDto>> GetTopLevelForums(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetForumRequest() { ParentForumId = null }, cancellationToken));
     }
@@ -22,9 +22,11 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [HttpGet]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ForumDto>>> GetForum(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ForumDto>> GetForum(int id, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetForumRequest() { ForumId = id }, cancellationToken));
+        var forum = await mediator.Send(new GetForumRequest() { ForumId = id }, cancellationToken);
+        return forum == null ? NotFound() : Ok(forum);
     }
 
     [HttpPost]

@@ -5,7 +5,7 @@
 namespace Forum.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Test : Migration
+    public partial class Test : Microsoft.EntityFrameworkCore.Migrations.Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

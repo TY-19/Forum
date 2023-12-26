@@ -22,6 +22,8 @@ public static class DependencyInjection
 
         services.AddScoped<IForumRepository, ForumRepository>();
         services.AddScoped<ITopicRepository, TopicRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

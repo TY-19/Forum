@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Application.Common.Mappings;
 using Forum.Application.Topics.Dtos;
 using MediatR;
 
@@ -9,6 +8,6 @@ public class GetTopicRequestHandler(ITopicRepository repository) : IRequestHandl
 {
     public async Task<TopicDto?> Handle(GetTopicRequest request, CancellationToken cancellationToken)
     {
-        return (await repository.GetTopicByIdAsync(request.Id, cancellationToken))?.ToTopicDto();
+        return await repository.GetTopicDtoByIdAsync(request.Id, cancellationToken);
     }
 }
