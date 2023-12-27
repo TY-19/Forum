@@ -9,14 +9,13 @@ namespace Forum.Infrastructure.Repositories;
 
 public class UserRepository(IForumDbContext context, IUserManager userManager) : IUserRepository
 {
-    public async Task<UserProfile> AddProfileToUserAsync(IUser user, CancellationToken cancellationToken)
+    public async Task AddProfileToUserAsync(IUser user, CancellationToken cancellationToken)
     {
         var profile = new UserProfile() { IdentityUserId = user?.Id ?? string.Empty };
-        await context.UserProfiles.AddAsync(profile, cancellationToken);
+        user!.UserProfile = profile;
         await context.SaveChangesAsync(cancellationToken);
         user!.UserProfileId = profile.Id;
         await context.SaveChangesAsync(cancellationToken);
-        return profile;
     }
     public UserMessageDto? GetUserMessageDtoById(int id)
     {

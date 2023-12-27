@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Application.Common.Mappings;
 using Forum.Application.Forums.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
@@ -12,7 +11,7 @@ public class CreateForumCommandHandler(IForumRepository repository) : IRequestHa
     {
         ForumEntity forum = ToForumEntity(command);
         await repository.AddForumAsync(forum, cancellationToken);
-        return forum.ToForumDto();
+        return await repository.GetForumDtoByIdAsync(forum.Id, cancellationToken);
     }
 
     private static ForumEntity ToForumEntity(CreateForumCommand command)

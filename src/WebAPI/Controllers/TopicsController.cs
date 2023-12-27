@@ -47,7 +47,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Success ? NoContent() : BadRequest(response.Message);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpPut]
@@ -57,7 +57,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> MoveTopicToAnotherForum(int topicId, int newForumId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new MoveTopicCommand() { Id = topicId, NewParentForumId = newForumId }, cancellationToken);
-        return response.Success ? NoContent() : BadRequest(response.Message);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpDelete]

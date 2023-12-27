@@ -11,11 +11,11 @@ public class UpdateTopicCommandHandler(ITopicRepository repository) : IRequestHa
     {
         var topic = await repository.GetTopicByIdAsync(command.Id, cancellationToken);
         if (topic == null)
-            return new CustomResponse() { Success = false, Message = "The topic with such an id does not exist" };
+            return new CustomResponse() { Succeed = false, Message = "The topic with such an id does not exist" };
 
         UpdateTopic(topic, command);
         await repository.UpdateTopicAsync(topic, cancellationToken);
-        return new CustomResponse() { Success = true };
+        return new CustomResponse() { Succeed = true };
     }
 
     private static void UpdateTopic(Topic topic, UpdateTopicCommand command)

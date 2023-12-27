@@ -11,11 +11,11 @@ public class UpdateForumCommandHandler(IForumRepository repository) : IRequestHa
     {
         var forum = await repository.GetForumByIdAsync(command.Id, cancellationToken);
         if (forum == null)
-            return new CustomResponse() { Success = false, Message = "The forum with such an id does not exist" };
+            return new CustomResponse() { Succeed = false, Message = "The forum with such an id does not exist" };
 
         UpdateForumModel(command, forum);
         await repository.UpdateForumAsync(forum, cancellationToken);
-        return new CustomResponse() { Success = true };
+        return new CustomResponse() { Succeed = true };
     }
 
     private static void UpdateForumModel(UpdateForumCommand command, ForumEntity forum)

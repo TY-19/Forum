@@ -1,5 +1,8 @@
-﻿using Forum.Application.Common.Interfaces;
+﻿using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.CreateUser;
+using Forum.Application.Users.Commands.DeleteUser;
+using Forum.Application.Users.Commands.UpdateUser;
+using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetAllUsers;
 using Forum.Application.Users.Queries.GetUser;
 using MediatR;
@@ -13,7 +16,7 @@ public class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<IUser>>> GetAllUsers(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetAllUsersRequest(), cancellationToken));
     }
@@ -22,7 +25,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IUser>> GetUserByProfileId(int profileId, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> GetUserByProfileId(int profileId, CancellationToken cancellationToken)
     {
         var user = await mediator.Send(new GetUserRequest() { UserProfileId = profileId }, cancellationToken);
         return user == null ? NotFound() : Ok(user);
@@ -35,6 +38,41 @@ public class UsersController(IMediator mediator) : ControllerBase
         return user == null
             ? BadRequest()
             : CreatedAtAction(nameof(GetUserByProfileId), new { profileId = user.UserProfileId }, user);
+    }
 
+    [Route("{userId}")]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateUser(string userId, UpdateUserCommand command, CancellationToken cancellationToken)
+    {
+        if (userId != command.UserId)
+            return BadRequest();
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
+    }
+
+    [Route("{userId}/changePassword")]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ChangeUserPassword(string userId, ChangePasswordCommand command, CancellationToken cancellationToken)
+    {
+        if (userId != command.UserId)
+            return BadRequest();
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
+    }
+
+    [Route("{userId}")]
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> DeleteUser(string userId, CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new DeleteUserCommand() { UserId = userId }, cancellationToken);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
     }
 }

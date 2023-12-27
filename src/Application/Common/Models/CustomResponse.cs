@@ -2,7 +2,13 @@
 
 public class CustomResponse
 {
-    public bool Success { get; set; }
+    public bool Succeed { get; set; }
     public string? Message { get; set; }
-    public object? Payload { get; set; }
+}
+
+public class CustomResponse<T>
+{
+    public bool Succeed { get; set; }
+    public string? Message { get; set; }
+    public T? Payload { get; set; }
 }

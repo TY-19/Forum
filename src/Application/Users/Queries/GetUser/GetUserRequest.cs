@@ -1,9 +1,9 @@
-﻿using Forum.Application.Common.Interfaces;
+﻿using Forum.Application.Users.Dtos;
 using MediatR;
 
 namespace Forum.Application.Users.Queries.GetUser;
 
-public class GetUserRequest : IRequest<IUser?>
+public class GetUserRequest : IRequest<UserDto?>
 {
     public int UserProfileId { get; set; }
 }

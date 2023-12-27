@@ -1,20 +1,20 @@
-﻿using Forum.Application.Common.Interfaces;
-using Forum.Application.Common.Interfaces.Identyty;
+﻿using Forum.Application.Common.Interfaces.Identyty;
 using Forum.Application.Common.Interfaces.Repositories;
+using Forum.Application.Users.Dtos;
 using MediatR;
 
 namespace Forum.Application.Users.Commands.CreateUser;
 
 public class CreateUserCommandHandler(IUserManager userManager,
-    IUserRepository repository) : IRequestHandler<CreateUserCommand, IUser?>
+    IUserRepository repository) : IRequestHandler<CreateUserCommand, UserDto?>
 {
-    public async Task<IUser?> Handle(CreateUserCommand command, CancellationToken cancellationToken)
+    public async Task<UserDto?> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await userManager.CreateUserAsync(command, cancellationToken);
-        if (user != null && user.Id != null)
+        var response = await userManager.CreateUserAsync(command, cancellationToken);
+        if (response.Payload != null && response.Payload.Id != null)
         {
-            await repository.AddProfileToUserAsync(user, cancellationToken);
+            await repository.AddProfileToUserAsync(response.Payload, cancellationToken);
         }
-        return user;
+        return await userManager.GetUserDtoByProfileIdAsync(response.Payload!.UserProfileId, cancellationToken);
     }
 }

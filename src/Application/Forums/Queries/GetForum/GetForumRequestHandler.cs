@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Application.Common.Mappings;
 using Forum.Application.Forums.Dtos;
 using MediatR;
 
@@ -13,11 +12,11 @@ public class GetForumRequestHandler(IForumRepository repository) : IRequestHandl
         {
             return new ForumDto()
             {
-                Subforums = (await repository.GetForumsByParentIdAsync(request.ParentForumId, cancellationToken)).ToSubforumsDto()
+                Subforums = await repository.GetSubForumsByParentIdAsync(request.ParentForumId, cancellationToken)
             };
         }
         int id = request.ForumId == null ? (int)request.ParentForumId! : (int)request.ForumId;
 
-        return (await repository.GetForumByIdAsync(id, cancellationToken))?.ToForumDto();
+        return await repository.GetForumDtoByIdAsync(id, cancellationToken);
     }
 }

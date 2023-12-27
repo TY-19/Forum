@@ -50,7 +50,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Success ? NoContent() : BadRequest(response.Message);
+        return response.Succeed ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpDelete]

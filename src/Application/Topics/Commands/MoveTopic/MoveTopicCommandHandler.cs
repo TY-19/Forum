@@ -10,10 +10,10 @@ public class MoveTopicCommandHandler(ITopicRepository repository) : IRequestHand
     {
         var topic = await repository.GetTopicByIdAsync(request.Id, cancellationToken);
         if (topic == null)
-            return new CustomResponse() { Success = false, Message = "The topic with such an id does not exist" };
+            return new CustomResponse() { Succeed = false, Message = "The topic with such an id does not exist" };
 
         topic.ParentForumId = request.NewParentForumId;
         await repository.UpdateTopicAsync(topic, cancellationToken);
-        return new CustomResponse() { Success = true };
+        return new CustomResponse() { Succeed = true };
     }
 }
