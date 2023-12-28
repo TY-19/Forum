@@ -47,6 +47,11 @@ public class ForumUserManager(UserManager<User> userManager) : IUserManager
         return GetCustomResponse(await userManager.UpdateAsync((User)user));
     }
 
+    public async Task<CustomResponse> CheckPasswordAsync(IUser user, string password, CancellationToken cancellationToken)
+    {
+        return new CustomResponse() { Succeeded = await userManager.CheckPasswordAsync((User)user, password) };
+    }
+
     public async Task<CustomResponse> ChangePasswordAsync(IUser user, string currentPassword, string newPassword)
     {
         return GetCustomResponse(await userManager.ChangePasswordAsync((User)user, currentPassword, newPassword));

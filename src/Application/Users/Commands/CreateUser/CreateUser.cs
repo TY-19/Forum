@@ -42,7 +42,7 @@ public class CreateUserCommandHandler(IUserManager userManager,
 
         var userDto = await GetUserDto(user, cancellationToken);
 
-        return new CustomResponse<UserDto> { Succeeded = false, Message = "The user was not created", Payload = userDto };
+        return new CustomResponse<UserDto> { Succeeded = true, Message = "The user was successfully created", Payload = userDto };
     }
 
     private async Task AddProfileToUserAsync(IUser user, CancellationToken cancellationToken)

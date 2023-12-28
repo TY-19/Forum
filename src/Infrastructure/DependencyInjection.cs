@@ -44,11 +44,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserManager, ForumUserManager>();
         services.AddScoped<IRoleManager, ForumRoleManager>();
-
-        //services.AddTransient<IIdentityService, IdentityService>();
-
-        //services.AddAuthorization(options =>
-        //    options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+        services.AddScoped<IJwtHandler, JwtHandler>();
 
         return services;
     }

@@ -10,6 +10,7 @@ public interface IUserManager
     Task<IUser?> GetUserByProfileIdAsync(int userProfileId, CancellationToken cancellationToken);
     Task<CustomResponse<IUser>> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken);
     Task<CustomResponse> UpdateUserAsync(IUser user, CancellationToken cancellationToken);
+    Task<CustomResponse> CheckPasswordAsync(IUser user, string password, CancellationToken cancellationToken);
     Task<CustomResponse> ChangePasswordAsync(IUser user, string currentPassword, string newPassword);
     Task<CustomResponse> DeleteUserAsync(IUser user, CancellationToken cancellationToken);
 
