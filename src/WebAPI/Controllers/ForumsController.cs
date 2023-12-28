@@ -34,10 +34,10 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreateForum(CreateForumCommand command, CancellationToken cancellationToken)
     {
-        var createdForum = await mediator.Send(command, cancellationToken);
-        return createdForum == null
-            ? BadRequest()
-            : CreatedAtAction(nameof(GetForum), new { id = createdForum.Id }, createdForum);
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded && response.Payload != null
+            ? CreatedAtAction(nameof(GetForum), new { id = response.Payload.Id }, response.Payload)
+            : BadRequest(response.Message);
     }
 
     [HttpPut]
@@ -50,15 +50,16 @@ public class ForumsController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpDelete]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> DeleteForum(int id, CancellationToken cancellationToken)
     {
-        await mediator.Send(new DeleteForumCommand() { Id = id }, cancellationToken);
-        return NoContent();
+        var response = await mediator.Send(new DeleteForumCommand() { Id = id }, cancellationToken);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 }

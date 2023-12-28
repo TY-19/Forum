@@ -1,5 +1,4 @@
 ﻿using Forum.Application.Common.Interfaces;
-using Forum.Application.Common.Interfaces.Identyty;
 using Forum.Infrastructure.Data;
 using Forum.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -43,8 +42,8 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<ForumDbContext>()
             .AddApiEndpoints();
 
-        services.AddScoped<IUserManager, IdentityUserManager>();
-        services.AddScoped<IRoleManager, IdentityRoleManager>();
+        services.AddScoped<IUserManager, ForumUserManager>();
+        services.AddScoped<IRoleManager, ForumRoleManager>();
 
         //services.AddTransient<IIdentityService, IdentityService>();
 

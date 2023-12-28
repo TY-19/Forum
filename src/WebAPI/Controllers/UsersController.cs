@@ -1,4 +1,5 @@
 ﻿using Forum.Application.Users.Commands.ChangePassword;
+using Forum.Application.Users.Commands.ChangeUserRoles;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.DeleteUser;
 using Forum.Application.Users.Commands.UpdateUser;
@@ -34,10 +35,10 @@ public class UsersController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateUser(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await mediator.Send(command, cancellationToken);
-        return user == null
-            ? BadRequest()
-            : CreatedAtAction(nameof(GetUserByProfileId), new { profileId = user.UserProfileId }, user);
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded && response.Payload != null
+            ? CreatedAtAction(nameof(GetUserByProfileId), new { profileId = response.Payload.UserProfileId }, response.Payload)
+            : BadRequest(response.Message);
     }
 
     [Route("{userId}")]
@@ -50,7 +51,7 @@ public class UsersController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [Route("{userId}/changePassword")]
@@ -63,7 +64,20 @@ public class UsersController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+    }
+
+    [Route("{userId}/roles")]
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ChangeUserRoles(string userId, ChangeUserRolesCommand command, CancellationToken cancellationToken)
+    {
+        if (userId != command.UserId)
+            return BadRequest();
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [Route("{userId}")]
@@ -73,6 +87,6 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeleteUser(string userId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteUserCommand() { UserId = userId }, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 }

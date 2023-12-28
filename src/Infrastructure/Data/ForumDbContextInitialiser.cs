@@ -1,5 +1,5 @@
-﻿using Forum.Application.Common.Interfaces.Repositories;
-using Forum.Domain.Common;
+﻿using Forum.Domain.Common;
+using Forum.Domain.Entities;
 using Forum.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,42 +8,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Forum.Infrastructure.Data;
 
-public class ForumDbContextInitialiser
+public class ForumDbContextInitialiser(IConfiguration configuration,
+    ILogger<ForumDbContextInitialiser> logger,
+    ForumDbContext context,
+    UserManager<User> userManager,
+    RoleManager<IdentityRole> roleManager)
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<ForumDbContextInitialiser> _logger;
-    private readonly ForumDbContext _context;
-    private readonly UserManager<User> _userManager;
-    private readonly IUserRepository _userRepository;
-    private readonly RoleManager<IdentityRole> _roleManager;
-
-    public ForumDbContextInitialiser(IConfiguration configuration,
-        ILogger<ForumDbContextInitialiser> logger,
-        ForumDbContext context,
-        UserManager<User> userManager,
-        RoleManager<IdentityRole> roleManager,
-        IUserRepository userRepository)
-    {
-        _configuration = configuration;
-        _logger = logger;
-        _context = context;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _userRepository = userRepository;
-    }
-
     public async Task InitialiseAsync()
     {
         try
         {
-            if (_context.Database.IsRelational() && _context.Database.GetPendingMigrations().Any())
+            if (context.Database.IsRelational() && context.Database.GetPendingMigrations().Any())
             {
-                await _context.Database.MigrateAsync();
+                await context.Database.MigrateAsync();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while migrating the database.");
+            logger.LogError(ex, "An error occurred while migrating the database.");
         }
     }
 
@@ -55,16 +37,16 @@ public class ForumDbContextInitialiser
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while seeding the database.");
+            logger.LogError(ex, "An error occurred while seeding the database.");
         }
     }
 
     public async Task TrySeedAsync()
     {
         await SeedDefaultRolesAsync();
-        bool reset = _configuration["DefaultAdmin:ResetIfExist"] == "true" ||
-            _configuration["DefaultAdmin:ResetIfExist"] == "1";
-        if (reset || (await _userManager.GetUsersInRoleAsync(DefaultRoles.ADMIN)).Any())
+        bool reset = configuration["DefaultAdmin:ResetIfExist"] == "true" ||
+            configuration["DefaultAdmin:ResetIfExist"] == "1";
+        if (reset || (await userManager.GetUsersInRoleAsync(DefaultRoles.ADMIN)).Any())
         {
             await SeedDefaultAdminAsync(reset);
         }
@@ -74,33 +56,42 @@ public class ForumDbContextInitialiser
     {
         var roles = new IdentityRole[]
         {
-            new IdentityRole(DefaultRoles.ADMIN),
-            new IdentityRole(DefaultRoles.USER)
+            new (DefaultRoles.ADMIN),
+            new (DefaultRoles.USER)
         };
-        foreach (var newRole in roles.Where(role => _roleManager.Roles.All(r => r.Name != role.Name)))
+        foreach (var newRole in roles.Where(role => roleManager.Roles.All(r => r.Name != role.Name)))
         {
-            await _roleManager.CreateAsync(newRole);
+            await roleManager.CreateAsync(newRole);
         }
     }
 
     public async Task SeedDefaultAdminAsync(bool reset)
     {
-        string adminName = _configuration["DefaultAdmin:Name"] ?? "admin";
-        string adminEmail = _configuration["DefaultAdmin:Email"] ?? "admin@example.com";
-        string adminPassword = _configuration["DefaultAdmin:Password"] ?? "Pa$$w0rd";
+        string adminName = configuration["DefaultAdmin:Name"] ?? "admin";
+        string adminEmail = configuration["DefaultAdmin:Email"] ?? "admin@example.com";
+        string adminPassword = configuration["DefaultAdmin:Password"] ?? "Pa$$w0rd";
         var administrator = new User { UserName = adminName, Email = adminEmail };
 
-        if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+        if (userManager.Users.All(u => u.UserName != administrator.UserName))
         {
-            await _userManager.CreateAsync(administrator, adminPassword);
-            await _userManager.AddToRoleAsync(administrator, DefaultRoles.ADMIN);
-            await _userRepository.AddProfileToUserAsync(administrator, new CancellationToken());
+            await userManager.CreateAsync(administrator, adminPassword);
+            await userManager.AddToRoleAsync(administrator, DefaultRoles.ADMIN);
+            await CreateDefaultAdminProfile(administrator);
         }
         else if (reset)
         {
-            await _userManager.UpdateAsync(administrator);
-            var token = await _userManager.GeneratePasswordResetTokenAsync(administrator);
-            await _userManager.ResetPasswordAsync(administrator, token, adminPassword);
+            await userManager.UpdateAsync(administrator);
+            var token = await userManager.GeneratePasswordResetTokenAsync(administrator);
+            await userManager.ResetPasswordAsync(administrator, token, adminPassword);
         }
+    }
+
+    private async Task CreateDefaultAdminProfile(User administrator)
+    {
+        var profile = new UserProfile() { IdentityUserId = administrator?.Id ?? string.Empty };
+        administrator!.UserProfile = profile;
+        await context.SaveChangesAsync(new CancellationToken());
+        administrator!.UserProfileId = profile.Id;
+        await context.SaveChangesAsync(new CancellationToken());
     }
 }

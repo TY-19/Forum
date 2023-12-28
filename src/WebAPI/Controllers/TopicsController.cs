@@ -31,10 +31,10 @@ public class TopicsController(IMediator mediator) : ControllerBase
         if (command.ParentForumId != forumId)
             return BadRequest();
 
-        var createdTopic = await mediator.Send(command, cancellationToken);
-        return createdTopic == null
-            ? BadRequest()
-            : CreatedAtAction(nameof(GetTopic), new { forumId, topicId = createdTopic.Id }, createdTopic);
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded && response.Payload != null
+            ? CreatedAtAction(nameof(GetTopic), new { forumId, topicId = response.Payload.Id }, response.Payload)
+            : BadRequest();
     }
 
     [HttpPut]
@@ -47,7 +47,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpPut]
@@ -57,14 +57,14 @@ public class TopicsController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> MoveTopicToAnotherForum(int topicId, int newForumId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new MoveTopicCommand() { Id = topicId, NewParentForumId = newForumId }, cancellationToken);
-        return response.Succeed ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [HttpDelete]
     [Route("{topicId}")]
     public async Task<ActionResult> DeleteTopic(int forumId, int topicId, CancellationToken cancellationToken)
     {
-        await mediator.Send(new DeleteTopicCommand() { TopicId = topicId, ForumId = forumId }, cancellationToken);
-        return NoContent();
+        var response = await mediator.Send(new DeleteTopicCommand() { TopicId = topicId, ForumId = forumId }, cancellationToken);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 }
