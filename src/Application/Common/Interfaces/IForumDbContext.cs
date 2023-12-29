@@ -9,6 +9,8 @@ public interface IForumDbContext
     DbSet<Topic> Topics { get; }
     DbSet<Message> Messages { get; }
     DbSet<UserProfile> UserProfiles { get; }
+    DbSet<ApplicationRole> ApplicationRoles { get; }
+    DbSet<Permission> Permissions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -23,13 +23,8 @@ public static class DependencyInjection
 
         services.AddScoped<ForumDbContextInitialiser>();
 
-        services.AddAuthentication()
-            .AddBearerToken(IdentityConstants.BearerScheme);
-
-        services.AddAuthorizationBuilder();
-
         services
-            .AddIdentityCore<User>(options =>
+            .AddIdentity<User, Role>(options =>
             {
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЇЮЯ";
                 options.Password.RequiredLength = 8;
@@ -38,7 +33,6 @@ public static class DependencyInjection
                 options.Password.RequireLowercase = false;
                 options.Password.RequireDigit = false;
             })
-            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ForumDbContext>()
             .AddApiEndpoints();
 

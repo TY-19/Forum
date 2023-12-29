@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Forum.Infrastructure.Data;
 
-public class ForumDbContext : IdentityDbContext<User>, IForumDbContext
+public class ForumDbContext : IdentityDbContext<User, Role, string>, IForumDbContext
 {
     public ForumDbContext(DbContextOptions<ForumDbContext> options) : base(options)
     {
@@ -16,6 +16,8 @@ public class ForumDbContext : IdentityDbContext<User>, IForumDbContext
     public DbSet<Topic> Topics => Set<Topic>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<ApplicationRole> ApplicationRoles => Set<ApplicationRole>();
+    public DbSet<Permission> Permissions => Set<Permission>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -4,16 +4,19 @@ using Forum.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Forum.Infrastructure.Data.Migrations
+namespace Forum.Infrastructure.Data.Migration
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231229172709_Permissions")]
+    partial class Permissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasIndex("RolesId");
 
-                    b.ToTable("ApplicationRolePermission", (string)null);
+                    b.ToTable("ApplicationRolePermission");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.ApplicationRole", b =>
@@ -54,7 +57,7 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.HasIndex("IdentityRoleId")
                         .IsUnique();
 
-                    b.ToTable("ApplicationRoles", (string)null);
+                    b.ToTable("ApplicationRoles");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.ForumEntity", b =>
@@ -82,7 +85,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasIndex("ParentForumId");
 
-                    b.ToTable("Forums", (string)null);
+                    b.ToTable("Forums");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.Message", b =>
@@ -115,7 +118,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.Permission", b =>
@@ -138,7 +141,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.Topic", b =>
@@ -160,7 +163,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasIndex("ParentForumId");
 
-                    b.ToTable("Topics", (string)null);
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("Forum.Domain.Entities.UserProfile", b =>
@@ -180,7 +183,7 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.HasIndex("IdentityUserId")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Forum.Infrastructure.Identity.Role", b =>
@@ -293,7 +296,7 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasIndex("PermissionsId");
 
-                    b.ToTable("ForumEntityPermission", (string)null);
+                    b.ToTable("ForumEntityPermission");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

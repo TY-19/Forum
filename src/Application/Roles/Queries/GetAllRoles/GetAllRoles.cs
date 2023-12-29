@@ -11,6 +11,6 @@ public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandl
 {
     public async Task<IEnumerable<string?>> Handle(GetAllRolesRequest request, CancellationToken cancellationToken)
     {
-        return await roleManager.GetAllRoles();
+        return await roleManager.GetAllRolesAsync();
     }
 }

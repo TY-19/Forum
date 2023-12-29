@@ -7,16 +7,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Infrastructure.Identity;
 
-public class ForumRoleManager(RoleManager<IdentityRole> roleManager) : IRoleManager
+public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
 {
-    public async Task<IEnumerable<string?>> GetAllRoles()
+    public async Task<IEnumerable<string?>> GetAllRolesAsync()
     {
         return await roleManager.Roles.Select(r => r.Name).ToListAsync();
     }
 
+    public async Task<string?> GetRoleByIdAsync(string roleId)
+    {
+        return (await roleManager.Roles.FirstOrDefaultAsync(r => r.Id == roleId))?.Name;
+    }
+    public async Task<string?> GetRoleByApplicationRoleIdAsync(int applicationRoleId)
+    {
+        return (await roleManager.Roles.FirstOrDefaultAsync(r => r.ApplicationRoleId == applicationRoleId))?.Name;
+    }
+
     public async Task<CustomResponse> CreateRoleAsync(string roleName, CancellationToken cancellationToken)
     {
-        var result = await roleManager.CreateAsync(new IdentityRole(roleName));
+        var result = await roleManager.CreateAsync(new Role(roleName));
         return GetCustomResponse(result);
     }
 
