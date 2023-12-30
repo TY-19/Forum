@@ -23,7 +23,7 @@ public class GetUserRequestHandler(IUserManager userManager) : IRequestHandler<G
             Id = user.Id,
             Email = user.Email,
             UserName = user.UserName,
-            UserProfileId = user.UserProfileId,
+            UserProfileId = user.UserProfile.Id,
             Roles = roles
         };
     }

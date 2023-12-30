@@ -50,8 +50,6 @@ public class CreateUserCommandHandler(IUserManager userManager,
         var profile = new UserProfile() { IdentityUserId = user?.Id ?? string.Empty };
         user!.UserProfile = profile;
         await context.SaveChangesAsync(cancellationToken);
-        user!.UserProfileId = profile.Id;
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<UserDto> GetUserDto(IUser user, CancellationToken cancellationToken)
@@ -61,7 +59,7 @@ public class CreateUserCommandHandler(IUserManager userManager,
             Id = user.Id,
             UserName = user.UserName,
             Email = user.Email,
-            UserProfileId = user.UserProfileId,
+            UserProfileId = user.UserProfile.Id,
             Roles = await userManager.GetRolesAsync(user, cancellationToken),
         };
     }

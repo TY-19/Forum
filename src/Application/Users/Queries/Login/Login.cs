@@ -35,7 +35,7 @@ public class LoginRequestHandler(IUserManager userManager, IJwtHandler jwtHandle
             Message = "Login is complete",
             Token = token,
             UserName = user.UserName,
-            UserProfileId = user.UserProfileId,
+            UserProfileId = user.UserProfile.Id,
             Roles = await userManager.GetRolesAsync(user, cancellationToken)
         };
     }

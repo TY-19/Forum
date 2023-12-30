@@ -20,13 +20,21 @@ public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
     }
     public async Task<string?> GetRoleByApplicationRoleIdAsync(int applicationRoleId)
     {
-        return (await roleManager.Roles.FirstOrDefaultAsync(r => r.ApplicationRoleId == applicationRoleId))?.Name;
+        return (await roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .FirstOrDefaultAsync(r => r.ApplicationRole.Id == applicationRoleId))?.Name;
     }
 
-    public async Task<CustomResponse> CreateRoleAsync(string roleName, CancellationToken cancellationToken)
+    public async Task<CustomResponse<IRole>> CreateRoleAsync(string roleName, CancellationToken cancellationToken)
     {
-        var result = await roleManager.CreateAsync(new Role(roleName));
-        return GetCustomResponse(result);
+        var role = new Role(roleName);
+        var result = await roleManager.CreateAsync(role);
+        return new CustomResponse<IRole>()
+        {
+            Succeeded = result.Succeeded,
+            Message = result.Errors.ToErrorString(),
+            Payload = role
+        };
     }
 
     public async Task<CustomResponse> UpdateRoleAsync(UpdateRoleCommand command, CancellationToken cancellationToken)

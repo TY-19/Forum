@@ -7,11 +7,8 @@ using System.Reflection;
 
 namespace Forum.Infrastructure.Data;
 
-public class ForumDbContext : IdentityDbContext<User, Role, string>, IForumDbContext
+public class ForumDbContext(DbContextOptions<ForumDbContext> options) : IdentityDbContext<User, Role, string>(options), IForumDbContext
 {
-    public ForumDbContext(DbContextOptions<ForumDbContext> options) : base(options)
-    {
-    }
     public DbSet<ForumEntity> Forums => Set<ForumEntity>();
     public DbSet<Topic> Topics => Set<Topic>();
     public DbSet<Message> Messages => Set<Message>();

@@ -29,6 +29,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> CreateTopic(int forumId, CreateTopicCommand command, CancellationToken cancellationToken)
     {
         if (command.ParentForumId != forumId)

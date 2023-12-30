@@ -1,17 +1,21 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
+using Forum.Application.Roles.Commands.CreateRole;
 using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using Forum.Infrastructure.Identity;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace Forum.Infrastructure.Data;
 
 public class ForumDbContextInitialiser(IConfiguration configuration,
     ILogger<ForumDbContextInitialiser> logger,
+    IMediator mediator,
     ForumDbContext context,
     UserManager<User> userManager,
     RoleManager<Role> roleManager,
@@ -54,7 +58,7 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         }
     }
 
-    public async Task TrySeedAsync()
+    private async Task TrySeedAsync()
     {
         await SeedDefaultRolesAsync();
         await SeedDefaultPermissionsAsync();
@@ -62,34 +66,24 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         await SeedDefaultAdminAsync();
     }
 
-    public async Task SeedDefaultRolesAsync()
+    private async Task SeedDefaultRolesAsync()
     {
         if (roleManager.Roles.Any() && !flags["SeedDefault"])
             return;
 
-        var roles = new Role[]
+        var roles = typeof(DefaultRoles)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(f => f.IsLiteral && f.IsStatic)
+            .Select(f => f.GetValue(null)?.ToString())
+            .Where(f => !string.IsNullOrEmpty(f))
+            .ToList();
+        foreach (var newRole in roles.Where(role => roleManager.Roles.All(r => r.Name != role)))
         {
-            new (DefaultRoles.ADMIN),
-            new (DefaultRoles.MODERATOR),
-            new (DefaultRoles.USER),
-            new (DefaultRoles.GUEST)
-        };
-        foreach (var newRole in roles.Where(role => roleManager.Roles.All(r => r.Name != role.Name)))
-        {
-            await roleManager.CreateAsync(newRole);
-            await CreateDefaultApplicationRoleAsync(newRole);
+            await mediator.Send(new CreateRoleCommand() { RoleName = newRole! });
         }
     }
-    private async Task CreateDefaultApplicationRoleAsync(Role role)
-    {
-        var appRole = new ApplicationRole() { IdentityRoleId = role.Id };
-        await context.ApplicationRoles.AddAsync(appRole);
-        await context.SaveChangesAsync();
-        role.ApplicationRoleId = appRole.Id;
-        await context.SaveChangesAsync();
-    }
 
-    public async Task SeedDefaultPermissionsAsync()
+    private async Task SeedDefaultPermissionsAsync()
     {
         if (context.Permissions.Any() && !flags["SeedDefault"])
             return;
@@ -140,7 +134,7 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         await context.SaveChangesAsync();
     }
 
-    public async Task SeedDefaultAdminAsync()
+    private async Task SeedDefaultAdminAsync()
     {
         if (!flags["ResetAdmin"] && (await userManager.GetUsersInRoleAsync(DefaultRoles.ADMIN)).Any())
             return;
@@ -154,7 +148,9 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         {
             await userManager.CreateAsync(administrator, adminPassword);
             await userManager.AddToRoleAsync(administrator, DefaultRoles.ADMIN);
-            await CreateDefaultAdminProfile(administrator);
+            var profile = new UserProfile() { IdentityUserId = administrator?.Id ?? string.Empty };
+            administrator!.UserProfile = profile;
+            await context.SaveChangesAsync(new CancellationToken());
         }
         else if (flags["ResetAdmin"])
         {
@@ -162,15 +158,6 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
             var token = await userManager.GeneratePasswordResetTokenAsync(administrator);
             await userManager.ResetPasswordAsync(administrator, token, adminPassword);
         }
-    }
-
-    private async Task CreateDefaultAdminProfile(User administrator)
-    {
-        var profile = new UserProfile() { IdentityUserId = administrator?.Id ?? string.Empty };
-        administrator!.UserProfile = profile;
-        await context.SaveChangesAsync(new CancellationToken());
-        administrator!.UserProfileId = profile.Id;
-        await context.SaveChangesAsync(new CancellationToken());
     }
 
     private static bool GetBooleanFromString(string? toBoolean)

@@ -16,7 +16,7 @@ namespace Forum.Infrastructure.Data.Migration
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            // No changes
         }
     }
 }

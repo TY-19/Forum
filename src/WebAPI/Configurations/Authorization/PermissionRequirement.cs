@@ -4,5 +4,5 @@ namespace Forum.WebAPI.Configurations.Authorization;
 
 public class PermissionRequirement(string? permissionType) : IAuthorizationRequirement
 {
-    public string? PermissionTypeName { get; set; } = permissionType;
+    public string? PermissionType { get; set; } = permissionType;
 }

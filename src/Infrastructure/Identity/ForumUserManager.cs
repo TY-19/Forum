@@ -17,19 +17,22 @@ public class ForumUserManager(UserManager<User> userManager) : IUserManager
 
     public async Task<IUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
     {
-        return await userManager.FindByIdAsync(userId);
+        return await userManager.Users
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
     public async Task<IUser?> GetUserByNameAsync(string userName, CancellationToken cancellationToken)
     {
-        return await userManager.FindByNameAsync(userName);
+        return await userManager.Users
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
     }
 
     public async Task<IUser?> GetUserByProfileIdAsync(int userProfileId, CancellationToken cancellationToken)
     {
         return await userManager.Users
-            .Where(u => u.UserProfileId == userProfileId)
             .Include(u => u.UserProfile)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(u => u.UserProfile.Id == userProfileId, cancellationToken);
     }
     public async Task<CustomResponse<IUser>> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {

@@ -23,7 +23,8 @@
     <Folder Include="Messages\Commands\DeleteMessage\" />
     <Folder Include="Messages\Commands\UpdateMessage\" />
     <Folder Include="Messages\Queries\GetUserMessages\" />
-    <Folder Include="Permissions\" />
+    <Folder Include="Permissions\Commands\" />
+    <Folder Include="Permissions\Queries\" />
   </ItemGroup>
 
 </Project>

@@ -3,12 +3,9 @@ using Microsoft.Extensions.Options;
 
 namespace Forum.WebAPI.Configurations.Authorization;
 
-public class PermissionAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
+public class PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : DefaultAuthorizationPolicyProvider(options)
 {
     internal const string PolicyPrefix = "PERMISSION_";
-    public PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
-    {
-    }
 
     public override async Task<AuthorizationPolicy?> GetPolicyAsync(
             string policyName)

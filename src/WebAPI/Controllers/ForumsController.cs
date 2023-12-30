@@ -20,12 +20,12 @@ public class ForumsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    [Route("{id}")]
+    [Route("{forumId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ForumDto>> GetForum(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<ForumDto>> GetForum(int forumId, CancellationToken cancellationToken)
     {
-        var forum = await mediator.Send(new GetForumRequest() { ForumId = id }, cancellationToken);
+        var forum = await mediator.Send(new GetForumRequest() { ForumId = forumId }, cancellationToken);
         return forum == null ? NotFound() : Ok(forum);
     }
 
@@ -41,12 +41,12 @@ public class ForumsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut]
-    [Route("{id}")]
+    [Route("{forumId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateForum(int id, UpdateForumCommand command, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateForum(int forumId, UpdateForumCommand command, CancellationToken cancellationToken)
     {
-        if (id != command.Id)
+        if (forumId != command.Id)
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
@@ -54,12 +54,12 @@ public class ForumsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{id}")]
+    [Route("{forumId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> DeleteForum(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteForum(int forumId, CancellationToken cancellationToken)
     {
-        var response = await mediator.Send(new DeleteForumCommand() { Id = id }, cancellationToken);
+        var response = await mediator.Send(new DeleteForumCommand() { Id = forumId }, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 }
