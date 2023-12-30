@@ -1,10 +1,10 @@
-﻿using Forum.Application.Permissions.Models;
-using Forum.Application.Topics.Commands.CreateTopic;
+﻿using Forum.Application.Topics.Commands.CreateTopic;
 using Forum.Application.Topics.Commands.DeleteTopic;
 using Forum.Application.Topics.Commands.MoveTopic;
 using Forum.Application.Topics.Commands.UpdateTopic;
 using Forum.Application.Topics.Dtos;
 using Forum.Application.Topics.Queries.GetTopic;
+using Forum.Domain.Constants;
 using Forum.WebAPI.Configurations.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return topic?.ParentForumId == forumId ? Ok(topic) : NotFound();
     }
 
-    [PermissionAuthorize(DefaultPermissionsNames.CanCreateTopicName)]
+    [PermissionAuthorize(DefaultPermissions.CanCreateTopic)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

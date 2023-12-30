@@ -1,7 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using Forum.Application.Users.Dtos;
-using Forum.Domain.Common;
+using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
 

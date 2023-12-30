@@ -1,5 +1,6 @@
-﻿using Forum.Application.Permissions.Models;
-using Forum.Domain.Common;
+﻿using Forum.Application.Common.Interfaces;
+using Forum.Application.Common.Models;
+using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using Forum.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -13,8 +14,16 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
     ILogger<ForumDbContextInitialiser> logger,
     ForumDbContext context,
     UserManager<User> userManager,
-    RoleManager<Role> roleManager)
+    RoleManager<Role> roleManager,
+    IPermissionHelper permissionHelper)
 {
+    private readonly Dictionary<string, bool> flags = new()
+    {
+        { "SkipSeeding", GetBooleanFromString(configuration?["SkipSeeding"]) },
+        { "SeedDefault", GetBooleanFromString(configuration?["SeedDefaultIfMissing"]) },
+        { "ResetAdmin",  GetBooleanFromString(configuration?["DefaultAdmin:ResetIfExist"]) }
+    };
+
     public async Task InitialiseAsync()
     {
         try
@@ -32,7 +41,7 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
 
     public async Task SeedAsync()
     {
-        if (configuration?["SkipSeeding"] == "true" || configuration?["SkipSeeding"] == "1")
+        if (flags["SkipSeeding"])
             return;
 
         try
@@ -49,21 +58,21 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
     {
         await SeedDefaultRolesAsync();
         await SeedDefaultPermissionsAsync();
-        await EnsureAdminHasAllPermissions();
-        bool reset = configuration["DefaultAdmin:ResetIfExist"] == "true" ||
-            configuration["DefaultAdmin:ResetIfExist"] == "1";
-        if (reset || (await userManager.GetUsersInRoleAsync(DefaultRoles.ADMIN)).Any())
-        {
-            await SeedDefaultAdminAsync(reset);
-        }
+        await SetDefaultPermissionsForRoles();
+        await SeedDefaultAdminAsync();
     }
 
     public async Task SeedDefaultRolesAsync()
     {
+        if (roleManager.Roles.Any() && !flags["SeedDefault"])
+            return;
+
         var roles = new Role[]
         {
             new (DefaultRoles.ADMIN),
-            new (DefaultRoles.USER)
+            new (DefaultRoles.MODERATOR),
+            new (DefaultRoles.USER),
+            new (DefaultRoles.GUEST)
         };
         foreach (var newRole in roles.Where(role => roleManager.Roles.All(r => r.Name != role.Name)))
         {
@@ -71,45 +80,71 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
             await CreateDefaultApplicationRoleAsync(newRole);
         }
     }
+    private async Task CreateDefaultApplicationRoleAsync(Role role)
+    {
+        var appRole = new ApplicationRole() { IdentityRoleId = role.Id };
+        await context.ApplicationRoles.AddAsync(appRole);
+        await context.SaveChangesAsync();
+        role.ApplicationRoleId = appRole.Id;
+        await context.SaveChangesAsync();
+    }
 
     public async Task SeedDefaultPermissionsAsync()
     {
-        foreach (var permissionType in DefaultPermissions.GetAllDefaultPermissions()
-            .Where(perm => context.Permissions.All(p => p.Name != perm.Name)))
+        if (context.Permissions.Any() && !flags["SeedDefault"])
+            return;
+
+        foreach (var permissionType in permissionHelper.DefaultPermissionTypes
+            .Where(perm => context.Permissions.All(p => p.Name != perm!.Name)))
         {
             var permission = new Permission()
             {
-                Name = permissionType.Name,
+                Name = permissionType!.Name,
                 Description = permissionType.Description,
                 IsGlobal = true,
             };
             await context.Permissions.AddAsync(permission);
-            await context.SaveChangesAsync();
         }
+        await context.SaveChangesAsync();
     }
 
-    public async Task EnsureAdminHasAllPermissions()
+    private async Task SetDefaultPermissionsForRoles()
     {
-
-        var adminRole = (await roleManager.Roles.Include(r => r.ApplicationRole)
-            .FirstOrDefaultAsync(r => r.Name == DefaultRoles.ADMIN))?.ApplicationRole;
-        if (adminRole == null)
+        if (!flags["SeedDefault"])
             return;
 
-        var permissions = await context.Permissions.Include(p => p.Roles).ToListAsync();
+        await SetDefaultPermissionsForRole(DefaultRoles.ADMIN, permissionHelper.GetAdminDefaultPermissions());
+        await SetDefaultPermissionsForRole(DefaultRoles.MODERATOR, permissionHelper.GetModeratorDefaultPermissions());
+        await SetDefaultPermissionsForRole(DefaultRoles.USER, permissionHelper.GetUserDefaultPermissions());
+        await SetDefaultPermissionsForRole(DefaultRoles.GUEST, permissionHelper.GetGuestDefaultPermissions());
+    }
+
+    private async Task SetDefaultPermissionsForRole(string roleName, IEnumerable<PermissionType> rolePermissions)
+    {
+        var role = (await roleManager.Roles.Include(r => r.ApplicationRole)
+            .FirstOrDefaultAsync(r => r.Name == roleName))?.ApplicationRole;
+        if (role == null)
+            return;
+
+        var permissions = await context.Permissions.Include(p => p.Roles)
+            .Where(p => rolePermissions.Select(rp => rp.Name).Contains(p.Name))
+            .ToListAsync();
 
         foreach (var permission in permissions)
         {
-            if (!permission.Roles.Contains(adminRole))
+            if (!permission.Roles.Contains(role))
             {
-                permission.Roles = permission.Roles.Concat(new List<ApplicationRole>() { adminRole }).ToList();
+                permission.Roles = permission.Roles.Concat(new List<ApplicationRole>() { role }).ToList();
             }
         }
         await context.SaveChangesAsync();
     }
 
-    public async Task SeedDefaultAdminAsync(bool reset)
+    public async Task SeedDefaultAdminAsync()
     {
+        if (!flags["ResetAdmin"] && (await userManager.GetUsersInRoleAsync(DefaultRoles.ADMIN)).Any())
+            return;
+
         string adminName = configuration["DefaultAdmin:Name"] ?? "admin";
         string adminEmail = configuration["DefaultAdmin:Email"] ?? "admin@example.com";
         string adminPassword = configuration["DefaultAdmin:Password"] ?? "Pa$$w0rd";
@@ -121,21 +156,12 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
             await userManager.AddToRoleAsync(administrator, DefaultRoles.ADMIN);
             await CreateDefaultAdminProfile(administrator);
         }
-        else if (reset)
+        else if (flags["ResetAdmin"])
         {
             await userManager.UpdateAsync(administrator);
             var token = await userManager.GeneratePasswordResetTokenAsync(administrator);
             await userManager.ResetPasswordAsync(administrator, token, adminPassword);
         }
-    }
-
-    private async Task CreateDefaultApplicationRoleAsync(Role role)
-    {
-        var appRole = new ApplicationRole() { IdentityRoleId = role.Id };
-        await context.ApplicationRoles.AddAsync(appRole);
-        await context.SaveChangesAsync();
-        role.ApplicationRoleId = appRole.Id;
-        await context.SaveChangesAsync();
     }
 
     private async Task CreateDefaultAdminProfile(User administrator)
@@ -145,5 +171,11 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         await context.SaveChangesAsync(new CancellationToken());
         administrator!.UserProfileId = profile.Id;
         await context.SaveChangesAsync(new CancellationToken());
+    }
+
+    private static bool GetBooleanFromString(string? toBoolean)
+    {
+        _ = bool.TryParse(toBoolean, out bool result);
+        return result || toBoolean == "1";
     }
 }

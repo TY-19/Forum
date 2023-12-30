@@ -44,9 +44,7 @@ public class JwtHandler(IConfiguration configuration, IUserManager userManager) 
 
     private SigningCredentials GetSigningCredentials()
     {
-        var test = configuration?["JwtSettings:SecurityKey"] ?? "defaultKey_that_is_32_characters";
-
-        var key = Encoding.UTF8.GetBytes(configuration?["JwtSettings:SecurityKey"] ?? "defaultKey");
+        var key = Encoding.UTF8.GetBytes(configuration?["JwtSettings:SecurityKey"] ?? "defaultKey_that_is_32_characters");
         var secret = new SymmetricSecurityKey(key);
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
     }

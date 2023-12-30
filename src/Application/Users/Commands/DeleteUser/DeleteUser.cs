@@ -1,6 +1,6 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
-using Forum.Domain.Common;
+using Forum.Domain.Constants;
 using MediatR;
 
 namespace Forum.Application.Users.Commands.DeleteUser;
