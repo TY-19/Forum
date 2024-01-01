@@ -19,6 +19,13 @@ public class ChangePasswordCommandHandler(IUserManager userManager) : IRequestHa
         if (user == null)
             return new CustomResponse() { Succeeded = false, Message = "A user with such an id does not exist" };
 
-        return await userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+        try
+        {
+            return await userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+        }
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 }

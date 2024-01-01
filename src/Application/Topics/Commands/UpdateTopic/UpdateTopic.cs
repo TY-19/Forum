@@ -25,13 +25,12 @@ public class UpdateTopicCommandHandler(IForumDbContext context) : IRequestHandle
         {
             context.Topics.Update(topic);
             await context.SaveChangesAsync(cancellationToken);
+            return new CustomResponse() { Succeeded = true };
         }
         catch (Exception ex)
         {
-            return new CustomResponse() { Succeeded = false, Message = ex.Message };
+            return new CustomResponse(ex);
         }
-
-        return new CustomResponse() { Succeeded = true };
     }
 
     private static void UpdateTopicProperties(Topic topic, UpdateTopicCommand command)

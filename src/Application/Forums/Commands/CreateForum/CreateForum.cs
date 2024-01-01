@@ -27,7 +27,7 @@ public class CreateForumCommandHandler(IForumDbContext context) : IRequestHandle
         }
         catch (Exception ex)
         {
-            return new CustomResponse<ForumDto>() { Succeeded = false, Message = ex.Message };
+            return new CustomResponse<ForumDto>(ex);
         }
 
         return new CustomResponse<ForumDto>() { Succeeded = true, Payload = ToForumDto(forum) };

@@ -22,7 +22,14 @@ public class DeleteUserCommandHandler(IUserManager userManager) : IRequestHandle
         if (await IsTheLastAdmin(command.UserId, cancellationToken))
             return new CustomResponse() { Succeeded = false, Message = "The last administrator cannot be deleted" };
 
-        return await userManager.DeleteUserAsync(user, cancellationToken);
+        try
+        {
+            return await userManager.DeleteUserAsync(user, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 
     private async Task<bool> IsTheLastAdmin(string userId, CancellationToken cancellationToken)

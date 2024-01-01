@@ -64,22 +64,9 @@ public class CreatePermissionCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
-            return new CustomResponse<PermissionGetDto>() { Succeeded = false, Message = ex.Message };
+            return new CustomResponse<PermissionGetDto>(ex);
         }
-        var permissionDto = GetPermissionGetDto(permission, roles);
-        return new CustomResponse<PermissionGetDto>() { Succeeded = true, Payload = permissionDto };
-    }
-
-    private static PermissionGetDto GetPermissionGetDto(Permission permission, IEnumerable<IRole> roles)
-    {
         var roleNames = roles.Where(r => r != null && r.Name != null).Select(r => r.Name!);
-        return new PermissionGetDto()
-        {
-            Name = permission.Name,
-            Description = permission.Description,
-            IsGlobal = permission.IsGlobal,
-            ForumId = permission.ForumId,
-            Roles = roleNames
-        };
+        return new CustomResponse<PermissionGetDto>() { Succeeded = true, Payload = new PermissionGetDto(permission, roleNames) };
     }
 }

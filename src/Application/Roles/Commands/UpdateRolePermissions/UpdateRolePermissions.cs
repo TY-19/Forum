@@ -2,9 +2,11 @@
 using Forum.Application.Common.Models;
 using Forum.Application.Permissions.Commands.CreatePermission;
 using Forum.Application.Permissions.Dtos;
+using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Text;
 
 namespace Forum.Application.Roles.Commands.UpdateRolePermissions;
@@ -30,12 +32,14 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
             return new CustomResponse() { Succeeded = false, Message = "Role does not exist" };
 
         var rolePerms = role.ApplicationRole.Permissions.ToList();
+        PreventGlobalPermissionsToBeRemovedFromAdminRole(role.Name, command);
+
         int expectedPermissionNumber = rolePerms.Count + command.PermissionsToAdd.Count() - command.PermissionsToRemove.Count();
 
         if (command.PermissionsToRemove.Any())
             RemovePermissionsFromList(rolePerms, command.PermissionsToRemove);
-        
-        if(command.PermissionsToAdd.Any())
+
+        if (command.PermissionsToAdd.Any())
             await AddExistingPermissionsToListAsync(rolePerms, command.PermissionsToAdd, cancellationToken);
 
         try
@@ -45,7 +49,7 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
-            return new CustomResponse() { Succeeded = false, Message = ex.Message };
+            return new CustomResponse(ex);
         }
 
         if (rolePerms.Count != expectedPermissionNumber)
@@ -59,6 +63,15 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
 
 
         return new CustomResponse() { Succeeded = true };
+    }
+
+    private static void PreventGlobalPermissionsToBeRemovedFromAdminRole(string? roleName, UpdateRolePermissionsCommand command)
+    {
+        if (roleName == DefaultRoles.ADMIN)
+        {
+            var globalPerms = command.PermissionsToRemove.Where(p => p.IsGlobal);
+            command.PermissionsToRemove = command.PermissionsToRemove.Except(globalPerms);
+        }
     }
 
     private static void RemovePermissionsFromList(List<Permission> rolePermissions, IEnumerable<PermissionPostDto> permissionsToRemove)
@@ -81,7 +94,7 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
             .Where(p => permissionsToAdd.Any(pta => AreEqual(p, pta)))
             .ToList();
 
-        foreach(var toAdd in toAddExisting)
+        foreach (var toAdd in toAddExisting)
         {
             if (!rolePermissions.Exists(rp => AreEqual(rp, toAdd)))
             {
@@ -122,7 +135,7 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
 
     private static bool AreEqual(Permission permission, PermissionPostDto dto)
     {
-        return permission != null && dto != null && permission.Name == dto.Name 
+        return permission != null && dto != null && permission.Name == dto.Name
             && permission.IsGlobal == dto.IsGlobal && permission.ForumId == dto.ForumId;
     }
     private static bool AreEqual(Permission permissionOne, Permission permissionTwo)

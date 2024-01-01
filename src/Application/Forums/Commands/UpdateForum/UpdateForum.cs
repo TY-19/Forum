@@ -36,7 +36,7 @@ public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandle
         }
         catch (Exception ex)
         {
-            return new CustomResponse() { Succeeded = false, Message = ex.Message };
+            return new CustomResponse(ex);
         }
 
         return new CustomResponse() { Succeeded = true };

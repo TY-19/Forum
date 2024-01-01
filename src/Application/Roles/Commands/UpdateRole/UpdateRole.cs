@@ -18,6 +18,13 @@ public class UpdateRoleCommandHandler(IRoleManager roleManager) : IRequestHandle
         if (command.OldName == DefaultRoles.ADMIN)
             return new CustomResponse() { Succeeded = false, Message = "Default admin role cannot be renamed" };
 
-        return await roleManager.UpdateRoleAsync(command, cancellationToken);
+        try
+        {
+            return await roleManager.UpdateRoleAsync(command, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 }

@@ -15,12 +15,18 @@ public class CreateRoleCommandHandler(IForumDbContext context,
 {
     public async Task<CustomResponse> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
-        var result = await roleManager.CreateRoleAsync(request.RoleName, cancellationToken);
-        if (result.Succeeded && result.Payload != null)
+        try
         {
-            await CreateApplicationRole(result.Payload.Id, cancellationToken);
+            var result = await roleManager.CreateRoleAsync(request.RoleName, cancellationToken);
+            if (result.Succeeded && result.Payload != null)
+                await CreateApplicationRole(result.Payload.Id, cancellationToken);
+
+            return new CustomResponse() { Succeeded = result.Succeeded, Message = result.Message };
         }
-        return new CustomResponse() { Succeeded = result.Succeeded, Message = result.Message };
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 
     private async Task CreateApplicationRole(string roleId, CancellationToken cancellationToken)

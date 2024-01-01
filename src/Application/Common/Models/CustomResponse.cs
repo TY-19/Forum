@@ -4,11 +4,23 @@ public class CustomResponse
 {
     public bool Succeeded { get; set; }
     public string? Message { get; set; }
+
+    public CustomResponse()
+    { }
+
+    public CustomResponse(Exception exception)
+    {
+        Succeeded = false;
+        Message = exception.Message;
+    }
 }
 
-public class CustomResponse<T>
+public class CustomResponse<T> : CustomResponse
 {
-    public bool Succeeded { get; set; }
-    public string? Message { get; set; }
     public T? Payload { get; set; }
+    public CustomResponse() : base()
+    { }
+
+    public CustomResponse(Exception exception) : base(exception)
+    { }
 }

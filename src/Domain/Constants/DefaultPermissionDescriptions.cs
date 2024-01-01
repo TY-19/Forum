@@ -32,7 +32,7 @@ public static class DefaultPermissionDescriptions
     public const string CanDeleteRole = "Can delete a role";
 
     public const string CanSeeAllPermissions = "Can see all permissions";
-    public const string CanCreatePermission = "Can add a permission";
+    public const string CanAddPermission = "Can add a permission";
     public const string CanUpdatePermission = "Can update a permission";
-    public const string CanDeletePermission = "Can remove a permission";
+    public const string CanRemovePermission = "Can remove a permission";
 }

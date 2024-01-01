@@ -37,7 +37,7 @@ public class CreateUserCommandHandler(IUserManager userManager,
         }
         catch (Exception ex)
         {
-            return new CustomResponse<UserDto> { Succeeded = false, Message = ex.Message };
+            return new CustomResponse<UserDto>(ex);
         }
 
         var userDto = await GetUserDto(user, cancellationToken);

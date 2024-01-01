@@ -19,15 +19,22 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager, IRoleManage
         if (user == null)
             return new CustomResponse() { Succeeded = false, Message = "There are no user with such an id" };
 
-        var currentRoles = await userManager.GetRolesAsync(user, cancellationToken);
-        var addingRolesResult = await AddRolesAsync(user, command.Roles.Except(currentRoles), cancellationToken);
-        var removingRolesResult = await RemoveRolesAsync(user, currentRoles.Except(command.Roles), cancellationToken);
-
-        return new CustomResponse()
+        try
         {
-            Succeeded = addingRolesResult.Succeeded && removingRolesResult.Succeeded,
-            Message = addingRolesResult.Message + " \n" + removingRolesResult.Message
-        };
+            var currentRoles = await userManager.GetRolesAsync(user, cancellationToken);
+            var addingRolesResult = await AddRolesAsync(user, command.Roles.Except(currentRoles), cancellationToken);
+            var removingRolesResult = await RemoveRolesAsync(user, currentRoles.Except(command.Roles), cancellationToken);
+
+            return new CustomResponse()
+            {
+                Succeeded = addingRolesResult.Succeeded && removingRolesResult.Succeeded,
+                Message = addingRolesResult.Message + " \n" + removingRolesResult.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 
     private async Task<CustomResponse> AddRolesAsync(IUser user, IEnumerable<string> rolesToAdd, CancellationToken cancellationToken)

@@ -39,18 +39,18 @@ public class PermissionHelper(IPermissionConfiguration configuration) : IPermiss
 
     private static List<PermissionType> GetAllDefaultPermissionTypes()
     {
-        var names = GetStringConstantsFromType(typeof(DefaultPermissions));
+        (string property, string name)[] names = GetStringConstantsFromType(typeof(DefaultPermissions));
 
-        var descriptions = GetStringConstantsFromType(typeof(DefaultPermissionDescriptions));
+        (string property, string desc)[] descriptions = GetStringConstantsFromType(typeof(DefaultPermissionDescriptions));
 
-        return names.Join(descriptions,
-            names => names.PropName,
-            descriptions => descriptions.PropName,
-            (name, desc) => new PermissionType
+        return names.GroupJoin(descriptions,
+            names => names.property,
+            descriptions => descriptions.property,
+            (name, grDesc) => new PermissionType
             {
-                Name = name.PropValue,
+                Name = name.name,
                 IsGlobal = true,
-                Description = desc.PropValue
+                Description = grDesc.Select(d => d.desc).FirstOrDefault()
             })
             .ToList();
     }

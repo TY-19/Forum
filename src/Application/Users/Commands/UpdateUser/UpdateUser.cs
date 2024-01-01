@@ -25,6 +25,13 @@ public class UpdateUserCommandHandler(IUserManager userManager) : IRequestHandle
         if (command.UpdatedEmail != null)
             user.Email = command.UpdatedEmail;
 
-        return await userManager.UpdateUserAsync(user, cancellationToken);
+        try
+        {
+            return await userManager.UpdateUserAsync(user, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            return new CustomResponse(ex);
+        }
     }
 }
