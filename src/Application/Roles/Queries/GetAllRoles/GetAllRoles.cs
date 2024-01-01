@@ -1,16 +1,21 @@
 ﻿using Forum.Application.Common.Interfaces;
+using Forum.Application.Roles.Dtos;
 using MediatR;
 
 namespace Forum.Application.Roles.Queries.GetAllRoles;
 
-public class GetAllRolesRequest : IRequest<IEnumerable<string?>>
+public class GetAllRolesRequest : IRequest<IEnumerable<RoleDto>>
 {
 }
 
-public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandler<GetAllRolesRequest, IEnumerable<string?>>
+public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandler<GetAllRolesRequest, IEnumerable<RoleDto>>
 {
-    public async Task<IEnumerable<string?>> Handle(GetAllRolesRequest request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<RoleDto>> Handle(GetAllRolesRequest request, CancellationToken cancellationToken)
     {
-        return await roleManager.GetAllRolesAsync();
+        var roles = await roleManager.GetAllRolesAsync(cancellationToken);
+        return roles
+            .Where(r => r.Name != null)
+            .Select(r => new RoleDto() { RoleName = r.Name! })
+            .ToList();
     }
 }

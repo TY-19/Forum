@@ -129,6 +129,9 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ForumId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsGlobal")
                         .HasColumnType("bit");
 
@@ -137,6 +140,8 @@ namespace Forum.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ForumId");
 
                     b.ToTable("Permissions");
                 });
@@ -273,21 +278,6 @@ namespace Forum.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("ForumEntityPermission", b =>
-                {
-                    b.Property<int>("ForumsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PermissionsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ForumsId", "PermissionsId");
-
-                    b.HasIndex("PermissionsId");
-
-                    b.ToTable("ForumEntityPermission");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -442,6 +432,13 @@ namespace Forum.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Forum.Domain.Entities.Permission", b =>
+                {
+                    b.HasOne("Forum.Domain.Entities.ForumEntity", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("ForumId");
+                });
+
             modelBuilder.Entity("Forum.Domain.Entities.Topic", b =>
                 {
                     b.HasOne("Forum.Domain.Entities.ForumEntity", null)
@@ -454,21 +451,6 @@ namespace Forum.Infrastructure.Data.Migrations
                     b.HasOne("Forum.Infrastructure.Identity.User", null)
                         .WithOne("UserProfile")
                         .HasForeignKey("Forum.Domain.Entities.UserProfile", "IdentityUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ForumEntityPermission", b =>
-                {
-                    b.HasOne("Forum.Domain.Entities.ForumEntity", null)
-                        .WithMany()
-                        .HasForeignKey("ForumsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Forum.Domain.Entities.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("PermissionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -526,6 +508,8 @@ namespace Forum.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Forum.Domain.Entities.ForumEntity", b =>
                 {
+                    b.Navigation("Permissions");
+
                     b.Navigation("Subforums");
 
                     b.Navigation("Topics");

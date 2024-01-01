@@ -10,6 +10,7 @@ public static class DefaultPermissions
     public const string CanReadTopic = "CanReadTopic";
     public const string CanCreateTopic = "CanCreateTopic";
     public const string CanUpdateTopic = "CanUpdateTopic";
+    public const string CanMoveTopic = "CanMoveTopic";
     public const string CanDeleteTopic = "CanDeleteTopic";
 
     public const string CanReadMessage = "CanReadMessage";
@@ -22,6 +23,7 @@ public static class DefaultPermissions
     public const string CanCreateUser = "CanCreateUser";
     public const string CanUpdateUser = "CanUpdateUser";
     public const string CanChangeUserPassword = "CanChangeUserPassword";
+    public const string CanChangeUserRole = "CanChangeUserRole";
     public const string CanDeleteUser = "CanDeleteUser";
 
     public const string CanGetAllRoles = "CanGetAllRoles";
@@ -29,6 +31,7 @@ public static class DefaultPermissions
     public const string CanUpdateRole = "CanUpdateRole";
     public const string CanDeleteRole = "CanDeleteRole";
 
+    public const string CanSeeAllPermissions = "CanSeeAllPermissions";
     public const string CanAddPermission = "CanAddPermission";
     public const string CanUpdatePermission = "CanUpdatePermission";
     public const string CanRemovePermission = "CanRemovePermission";

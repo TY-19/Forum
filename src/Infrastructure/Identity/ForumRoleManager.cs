@@ -9,20 +9,34 @@ namespace Forum.Infrastructure.Identity;
 
 public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
 {
-    public async Task<IEnumerable<string?>> GetAllRolesAsync()
+    public async Task<IEnumerable<IRole>> GetAllRolesAsync(CancellationToken cancellationToken)
     {
-        return await roleManager.Roles.Select(r => r.Name).ToListAsync();
+        return await roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .ThenInclude(ar => ar.Permissions)
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<string?> GetRoleByIdAsync(string roleId)
+    public async Task<IRole?> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken)
     {
-        return (await roleManager.Roles.FirstOrDefaultAsync(r => r.Id == roleId))?.Name;
-    }
-    public async Task<string?> GetRoleByApplicationRoleIdAsync(int applicationRoleId)
-    {
-        return (await roleManager.Roles
+        return await roleManager.Roles
             .Include(r => r.ApplicationRole)
-            .FirstOrDefaultAsync(r => r.ApplicationRole.Id == applicationRoleId))?.Name;
+            .ThenInclude(ar => ar.Permissions)
+            .FirstOrDefaultAsync(r => r.Id == roleId, cancellationToken);
+    }
+    public async Task<IRole?> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken)
+    {
+        return await roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .ThenInclude(ar => ar.Permissions)
+            .FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
+    }
+    public async Task<IRole?> GetRoleByApplicationRoleIdAsync(int applicationRoleId, CancellationToken cancellationToken)
+    {
+        return await roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .ThenInclude(ar => ar.Permissions)
+            .FirstOrDefaultAsync(r => r.ApplicationRole.Id == applicationRoleId, cancellationToken);
     }
 
     public async Task<CustomResponse<IRole>> CreateRoleAsync(string roleName, CancellationToken cancellationToken)

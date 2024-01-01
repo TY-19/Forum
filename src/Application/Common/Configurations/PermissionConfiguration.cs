@@ -32,6 +32,7 @@ public class PermissionConfiguration : IPermissionConfiguration
 
         DefaultPermissions.CanReadTopic,
         DefaultPermissions.CanCreateTopic,
+        DefaultPermissions.CanMoveTopic,
         DefaultPermissions.CanUpdateTopic,
         DefaultPermissions.CanDeleteTopic,
 
@@ -39,9 +40,6 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanCreateMessage,
         DefaultPermissions.CanUpdateMessage,
         DefaultPermissions.CanDeleteMessage,
-
-        DefaultPermissions.CanCreateUser,
-        DefaultPermissions.CanUpdateUser,
     };
 
     public List<string> UserDefaultPermissions => new()
@@ -52,9 +50,6 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanReadMessage,
         DefaultPermissions.CanCreateMessage,
         DefaultPermissions.CanUpdateMessage,
-
-        DefaultPermissions.CanCreateUser,
-        DefaultPermissions.CanUpdateUser,
     };
 
     public List<string> GuestDefaultPermissions => new()

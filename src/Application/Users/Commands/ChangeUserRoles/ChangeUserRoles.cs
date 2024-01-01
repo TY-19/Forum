@@ -33,11 +33,11 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager, IRoleManage
     private async Task<CustomResponse> AddRolesAsync(IUser user, IEnumerable<string> rolesToAdd, CancellationToken cancellationToken)
     {
         var response = new CustomResponse() { Succeeded = true };
-        var allRoles = await roleManager.GetAllRolesAsync();
+        var allRoles = await roleManager.GetAllRolesAsync(cancellationToken);
         List<string> notRoles = [];
         foreach (var role in rolesToAdd)
         {
-            if (!allRoles.Contains(role))
+            if (!allRoles.Select(r => r.Name).Contains(role))
             {
                 notRoles.Add(role);
                 response.Succeeded = false;

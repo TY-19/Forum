@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Forum.Infrastructure.Data.Migration
+namespace Forum.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
     [Migration("20231226184157_Users Update")]

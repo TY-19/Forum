@@ -6,6 +6,8 @@ using Forum.Application.Users.Commands.UpdateUser;
 using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetAllUsers;
 using Forum.Application.Users.Queries.GetUser;
+using Forum.Domain.Constants;
+using Forum.WebAPI.Configurations.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,16 +17,22 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class UsersController(IMediator mediator) : ControllerBase
 {
+    [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(new GetAllUsersRequest(), cancellationToken));
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]
     [Route("{profileId}")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserDto>> GetUserByProfileId(int profileId, CancellationToken cancellationToken)
     {
@@ -32,7 +40,12 @@ public class UsersController(IMediator mediator) : ControllerBase
         return user == null ? NotFound() : Ok(user);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanCreateUser)]
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> CreateUser(CreateUserCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
@@ -41,10 +54,13 @@ public class UsersController(IMediator mediator) : ControllerBase
             : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanUpdateUser)]
     [Route("{userId}")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> UpdateUser(string userId, UpdateUserCommand command, CancellationToken cancellationToken)
     {
         if (userId != command.UserId)
@@ -54,10 +70,13 @@ public class UsersController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanChangeUserPassword)]
     [Route("{userId}/changePassword")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> ChangeUserPassword(string userId, ChangePasswordCommand command, CancellationToken cancellationToken)
     {
         if (userId != command.UserId)
@@ -71,6 +90,8 @@ public class UsersController(IMediator mediator) : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> ChangeUserRoles(string userId, ChangeUserRolesCommand command, CancellationToken cancellationToken)
     {
         if (userId != command.UserId)
@@ -80,10 +101,13 @@ public class UsersController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanDeleteUser)]
     [Route("{userId}")]
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> DeleteUser(string userId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteUserCommand() { UserId = userId }, cancellationToken);

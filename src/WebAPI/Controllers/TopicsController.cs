@@ -1,4 +1,5 @@
-﻿using Forum.Application.Topics.Commands.CreateTopic;
+﻿using Forum.Application.Permissions.Queries.CheckUserPermission;
+using Forum.Application.Topics.Commands.CreateTopic;
 using Forum.Application.Topics.Commands.DeleteTopic;
 using Forum.Application.Topics.Commands.MoveTopic;
 using Forum.Application.Topics.Commands.UpdateTopic;
@@ -15,9 +16,12 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class TopicsController(IMediator mediator) : ControllerBase
 {
+    [PermissionAuthorize(DefaultPermissions.CanReadTopic)]
     [HttpGet]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TopicDto>> GetTopic(int forumId, int topicId, CancellationToken cancellationToken)
     {
@@ -29,6 +33,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> CreateTopic(int forumId, CreateTopicCommand command, CancellationToken cancellationToken)
     {
@@ -41,10 +46,13 @@ public class TopicsController(IMediator mediator) : ControllerBase
             : BadRequest();
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanUpdateTopic)]
     [HttpPut]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> UpdateTopic(int topicId, UpdateTopicCommand command, CancellationToken cancellationToken)
     {
         if (topicId != command.Id)
@@ -54,18 +62,37 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanMoveTopic)]
     [HttpPut]
     [Route("{topicId}/move/{newForumId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> MoveTopicToAnotherForum(int topicId, int newForumId, CancellationToken cancellationToken)
     {
+        var checkUserPermissionForDestination = await mediator.Send(
+            new CheckUserPermissionRequest
+            {
+                PermissionName = DefaultPermissions.CanMoveTopic,
+                ForumId = newForumId,
+                UserName = User.Identity?.Name
+            }, cancellationToken);
+
+        if (!checkUserPermissionForDestination.Succeeded)
+            return Forbid();
+
         var response = await mediator.Send(new MoveTopicCommand() { Id = topicId, NewParentForumId = newForumId }, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanDeleteTopic)]
     [HttpDelete]
     [Route("{topicId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> DeleteTopic(int forumId, int topicId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteTopicCommand() { TopicId = topicId, ForumId = forumId }, cancellationToken);

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Forum.Infrastructure.Data.Migration
+namespace Forum.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class Permissions : Microsoft.EntityFrameworkCore.Migrations.Migration

@@ -14,5 +14,8 @@ public class ForumConfiguration : IEntityTypeConfiguration<ForumEntity>
         builder.HasMany(x => x.Topics)
             .WithOne()
             .HasForeignKey(x => x.ParentForumId);
+        builder.HasMany(x => x.Permissions)
+            .WithOne()
+            .HasForeignKey(x => x.ForumId);
     }
 }
