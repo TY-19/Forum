@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Application.Messages.Queries.GetMessage;
 
-public class GetMessageCommand : IRequest<MessageDto?>
+public class GetMessageRequest : IRequest<MessageDto?>
 {
     public int Id { get; set; }
 }
 
-public class GetMessageCommandHandler(IForumDbContext context, IUserManager userManager) : IRequestHandler<GetMessageCommand, MessageDto?>
+public class GetMessageCommandHandler(IForumDbContext context, IUserManager userManager) : IRequestHandler<GetMessageRequest, MessageDto?>
 {
-    public async Task<MessageDto?> Handle(GetMessageCommand request, CancellationToken cancellationToken)
+    public async Task<MessageDto?> Handle(GetMessageRequest request, CancellationToken cancellationToken)
     {
         var message = await context.Messages.FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
         if (message == null)

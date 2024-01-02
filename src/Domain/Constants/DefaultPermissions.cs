@@ -15,10 +15,13 @@ public static class DefaultPermissions
 
     public const string CanReadMessage = "CanReadMessage";
     public const string CanCreateMessage = "CanCreateMessage";
+    public const string CanUpdateOwnMessage = "CanUpdateOwnMessage";
     public const string CanUpdateMessage = "CanUpdateMessage";
+    public const string CanDeleteOwnMessage = "CanDeleteOwnMessage";
     public const string CanDeleteMessage = "CanDeleteMessage";
 
     public const string CanGetUserInfo = "CanGetUserInfo";
+    public const string CanSeeOwnMessages = "CanSeeOwnMessages";
     public const string CanSeeUserMessages = "CanSeeUserMessages";
     public const string CanCreateUser = "CanCreateUser";
     public const string CanUpdateUser = "CanUpdateUser";

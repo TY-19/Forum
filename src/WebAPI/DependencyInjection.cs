@@ -51,7 +51,7 @@ public static class DependencyInjection
 
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Task Tracker", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Forum", Version = "v1" });
             options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,

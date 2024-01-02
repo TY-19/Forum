@@ -18,11 +18,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Messages\Commands\CreateMessage\" />
-    <Folder Include="Messages\Commands\DeleteMessage\" />
-    <Folder Include="Messages\Commands\UpdateMessage\" />
-    <Folder Include="Messages\Queries\GetUserMessages\" />
-  </ItemGroup>
-
 </Project>

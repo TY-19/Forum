@@ -1,4 +1,6 @@
-﻿using Forum.Application.Users.Commands.ChangePassword;
+﻿using Forum.Application.Messages.Dtos;
+using Forum.Application.Messages.Queries.GetUserMessages;
+using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.ChangeUserRoles;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.DeleteUser;
@@ -112,5 +114,21 @@ public class UsersController(IMediator mediator) : ControllerBase
     {
         var response = await mediator.Send(new DeleteUserCommand() { UserId = userId }, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
+    }
+
+    [PermissionAuthorize(DefaultPermissions.CanSeeUserMessages)]
+    [Route("{profileId}/messages")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<IEnumerable<MessageDto>>> GetUserMessages(int profileId, CancellationToken cancellationToken)
+    {
+        var command = new GetUserMessagesRequest()
+        {
+            ProfileId = profileId,
+            UserName = User.Identity?.Name ?? "",
+        };
+        return Ok(await mediator.Send(command, cancellationToken));
     }
 }
