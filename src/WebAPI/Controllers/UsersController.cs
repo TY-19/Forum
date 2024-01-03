@@ -1,4 +1,5 @@
-﻿using Forum.Application.Messages.Dtos;
+﻿using Forum.Application.Common.Models;
+using Forum.Application.Messages.Dtos;
 using Forum.Application.Messages.Queries.GetUserMessages;
 using Forum.Application.Users.Commands.ChangeUserRoles;
 using Forum.Application.Users.Commands.CreateUser;
@@ -24,9 +25,20 @@ public class UsersController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(int? page, int? size,
+        string? filterBy, string? filterText, string? orderBy, bool? orderAsc, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllUsersRequest(), cancellationToken));
+        var pageOptions = new PageOptions() { PageNumber = page, PageSize = size };
+        var filterOptions = new FilterOptions() { FilterBy = filterBy, FilterText = filterText };
+        var orderOptions = new OrderOptions() { OrderBy = orderBy, OrderAscending = orderAsc };
+        var request = new GetAllUsersRequest()
+        {
+            PageOptions = pageOptions,
+            FilterOptions = filterOptions,
+            OrderOptions = orderOptions
+        };
+
+        return Ok(await mediator.Send(request, cancellationToken));
     }
 
     [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]

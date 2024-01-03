@@ -8,6 +8,10 @@ namespace Forum.Infrastructure.Identity;
 
 public class ForumUserManager(UserManager<User> userManager) : IUserManager
 {
+    public IQueryable<IUser> GetAllUsers()
+    {
+        return userManager.Users.Include(u => u.UserProfile);
+    }
     public async Task<IEnumerable<IUser>> GetAllUsersAsync(CancellationToken cancellationToken)
     {
         return await userManager.Users

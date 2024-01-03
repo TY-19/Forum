@@ -4,6 +4,8 @@ namespace Forum.Application.Common.Interfaces;
 
 public interface IUserManager
 {
+    IQueryable<IUser> GetAllUsers();
+
     Task<IEnumerable<IUser>> GetAllUsersAsync(CancellationToken cancellationToken);
     Task<IUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);
     Task<IUser?> GetUserByNameAsync(string userName, CancellationToken cancellationToken);

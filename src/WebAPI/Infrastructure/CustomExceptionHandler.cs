@@ -11,7 +11,7 @@ public class CustomExceptionHandler : IExceptionHandler
     {
         _exceptionHandlers = new()
         {
-            { typeof(CustomValidationException), HandleValidationException }
+            { typeof(CustomValidationException), HandleValidationExceptionAsync }
         };
     }
 
@@ -23,10 +23,14 @@ public class CustomExceptionHandler : IExceptionHandler
             await value!.Invoke(httpContext, exception);
             return true;
         }
-        return false;
+        else
+        {
+            await HandleDefaultExceptionAsync(httpContext, exception);
+            return true;
+        }
     }
 
-    private async Task HandleValidationException(HttpContext httpContext, Exception exception)
+    private async Task HandleValidationExceptionAsync(HttpContext httpContext, Exception exception)
     {
         var ex = (CustomValidationException)exception;
 
@@ -36,6 +40,20 @@ public class CustomExceptionHandler : IExceptionHandler
         {
             Status = StatusCodes.Status400BadRequest,
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        });
+    }
+
+    private static async Task HandleDefaultExceptionAsync(HttpContext httpContext, Exception exception)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        await httpContext.Response.WriteAsJsonAsync(new 
+        {
+            Status = StatusCodes.Status400BadRequest,
+            exception.Message,
+            exception.StackTrace,
+            InnerException = exception.InnerException?.Message
+
         });
     }
 }
