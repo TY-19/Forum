@@ -1,9 +1,9 @@
 ﻿using Forum.Application.Messages.Dtos;
 using Forum.Application.Messages.Queries.GetUserMessages;
-using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.ChangeUserRoles;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.DeleteUser;
+using Forum.Application.Users.Commands.SetPassword;
 using Forum.Application.Users.Commands.UpdateUser;
 using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetAllUsers;
@@ -30,15 +30,15 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]
-    [Route("{profileId}")]
+    [Route("{userId}")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDto>> GetUserByProfileId(int profileId, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> GetUserByProfileId(string userId, CancellationToken cancellationToken)
     {
-        var user = await mediator.Send(new GetUserRequest() { UserProfileId = profileId }, cancellationToken);
+        var user = await mediator.Send(new GetUserRequest() { UserId = userId }, cancellationToken);
         return user == null ? NotFound() : Ok(user);
     }
 
@@ -79,7 +79,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult> ChangeUserPassword(string userId, ChangePasswordCommand command, CancellationToken cancellationToken)
+    public async Task<ActionResult> ChangeUserPassword(string userId, SetPasswordCommand command, CancellationToken cancellationToken)
     {
         if (userId != command.UserId)
             return BadRequest();

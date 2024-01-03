@@ -11,7 +11,8 @@ public interface IUserManager
     Task<CustomResponse<IUser>> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken);
     Task<CustomResponse> UpdateUserAsync(IUser user, CancellationToken cancellationToken);
     Task<CustomResponse> CheckPasswordAsync(IUser user, string password, CancellationToken cancellationToken);
-    Task<CustomResponse> ChangePasswordAsync(IUser user, string currentPassword, string newPassword);
+    Task<CustomResponse> ChangePasswordAsync(IUser user, string currentPassword, string newPassword, CancellationToken cancellationToken);
+    Task<CustomResponse> SetPasswordAsync(IUser user, string newPassword, CancellationToken cancellationToken);
     Task<CustomResponse> DeleteUserAsync(IUser user, CancellationToken cancellationToken);
 
     Task<IEnumerable<string>> GetRolesAsync(IUser user, CancellationToken cancellationToken);
