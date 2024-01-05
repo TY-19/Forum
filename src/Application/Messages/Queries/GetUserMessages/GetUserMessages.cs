@@ -35,7 +35,8 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
             messages = context.UserProfiles
                 .Where(up => up.Id == request.ProfileId)
                 .Include(up => up.Messages)
-                .SelectMany(up => up.Messages);
+                .SelectMany(up => up.Messages)
+                .AsNoTracking();
             return await GetMessageDtosAsync(await messages.ToListAsync(cancellationToken), user, cancellationToken);
         }
 
@@ -54,6 +55,7 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
         var messageTopicIds = await messages.Select(m => m.TopicId).ToListAsync(cancellationToken);
 
         var allowedTopicIds = await context.Topics
+            .AsNoTracking()
             .Where(t => messageTopicIds.Contains(t.Id)
                 && t.ParentForumId != null
                 && allowedForumIds.Contains((int)t.ParentForumId))

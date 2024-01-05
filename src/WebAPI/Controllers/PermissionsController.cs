@@ -21,9 +21,20 @@ public class PermissionsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<PermissionGetDto>>> GetAllPermissions(
-        bool? filteGlobal, int? forumId, CancellationToken cancellationToken)
+        bool? filterGlobal, int? forumId, string? filterText, int? pageSize, int? page, 
+        bool? orderAscending, CancellationToken cancellationToken)
     {
-        var request = new GetAllPermissionsRequest() { FilterIsGlobal = filteGlobal, FilterForumId = forumId };
+        var request = new GetAllPermissionsRequest() { 
+            FilterIsGlobal = filterGlobal, 
+            FilterForumId = forumId,
+            RequestParameters = new()
+            {
+                FilterText = filterText,
+                PageSize = pageSize,
+                PageNumber = page,
+                OrderAscending = orderAscending
+            }
+        };
         return Ok(await mediator.Send(request, cancellationToken));
     }
 

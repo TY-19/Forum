@@ -9,6 +9,13 @@ namespace Forum.Infrastructure.Identity;
 
 public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
 {
+    public IQueryable<IRole> GetAllRoles()
+    {
+        return roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .ThenInclude(ar => ar.Permissions)
+            .AsNoTracking();
+    }
     public async Task<IEnumerable<IRole>> GetAllRolesAsync(CancellationToken cancellationToken)
     {
         return await roleManager.Roles

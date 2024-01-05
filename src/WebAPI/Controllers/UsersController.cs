@@ -28,17 +28,16 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(int? page, int? size,
         string? filterBy, string? filterText, string? orderBy, bool? orderAsc, CancellationToken cancellationToken)
     {
-        var pageOptions = new PageOptions() { PageNumber = page, PageSize = size };
-        var filterOptions = new FilterOptions() { FilterBy = filterBy, FilterText = filterText };
-        var orderOptions = new OrderOptions() { OrderBy = orderBy, OrderAscending = orderAsc };
-        var request = new GetAllUsersRequest()
-        {
-            PageOptions = pageOptions,
-            FilterOptions = filterOptions,
-            OrderOptions = orderOptions
+        var requestParameters = new RequestParameters() {
+            PageNumber = page,
+            PageSize = size,
+            FilterBy = filterBy,
+            FilterText = filterText,
+            OrderBy = orderBy,
+            OrderAscending = orderAsc
         };
-
-        return Ok(await mediator.Send(request, cancellationToken));
+        return Ok(await mediator.Send(new GetAllUsersRequest() {
+            RequestParameters = requestParameters }, cancellationToken));
     }
 
     [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]

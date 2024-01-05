@@ -9,9 +9,7 @@ namespace Forum.Application.Users.Queries.GetAllUsers;
 
 public class GetAllUsersRequest : IRequest<PaginatedResponse<UserDto>>
 {
-    public PageOptions? PageOptions { get; set; }
-    public FilterOptions? FilterOptions { get; set; }
-    public OrderOptions? OrderOptions { get; set; }
+    public RequestParameters RequestParameters { get; set; } = new();
 }
 
 public class GetAllUsersRequestHandler(IUserManager userManager) : IRequestHandler<GetAllUsersRequest, PaginatedResponse<UserDto>>
@@ -19,13 +17,13 @@ public class GetAllUsersRequestHandler(IUserManager userManager) : IRequestHandl
     public async Task<PaginatedResponse<UserDto>> Handle(GetAllUsersRequest request, CancellationToken cancellationToken)
     {
         var users = userManager.GetAllUsers();
-        FilterUsers(ref users, request.FilterOptions);
-        OrderUsers(users, request.OrderOptions);
-        return await GetPaginatedResponseAsync(users, request.PageOptions, cancellationToken);
+        FilterUsers(ref users, request.RequestParameters);
+        OrderUsers(users, request.RequestParameters);
+        return await GetPaginatedResponseAsync(users, request.RequestParameters, cancellationToken);
     }
 
-    private const int DefaultPageSize = 20;
-    private const int MaxPageSize = 1000;
+    private const int defaultPageSize = 20;
+    private const int maxPageSize = 1000;
 
     private static Dictionary<string, string[]> PropertyNames => new()
     {
@@ -37,79 +35,72 @@ public class GetAllUsersRequestHandler(IUserManager userManager) : IRequestHandl
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons",
         Justification = "https://github.com/dotnet/efcore/issues/20995#issuecomment-631358780 EF Core does not translate the overload that accepts StringComparison.InvariantCultureIgnoreCase (or any other StringComparison).")]
-    private static void FilterUsers(ref IQueryable<IUser> users, FilterOptions? filterOptions)
+    private static void FilterUsers(ref IQueryable<IUser> users, RequestParameters requestParameters)
     {
-        if (filterOptions == null || filterOptions.FilterText == null)
+        if (requestParameters.FilterText == null)
             return;
 
-        if (filterOptions.FilterBy == null)
-            users = users.Where(u => (u.UserName != null && u.UserName.ToLower().Contains(filterOptions.FilterText.ToLower()))
-                || (u.Email != null && u.Email.Contains(filterOptions.FilterText)));
+        if (requestParameters.FilterBy == null)
+            users = users.Where(u => (u.UserName != null && u.UserName.ToLower().Contains(requestParameters.FilterText.ToLower()))
+                || (u.Email != null && u.Email.Contains(requestParameters.FilterText)));
 
-        else if (filterOptions.FilterBy.CheckStringEquality(PropertyNames["name"]))
-            users = users.Where(u => u.UserName != null && u.UserName.ToLower().Contains(filterOptions.FilterText.ToLower()));
+        else if (requestParameters.FilterBy.CheckStringEquality(PropertyNames["name"]))
+            users = users.Where(u => u.UserName != null && u.UserName.ToLower().Contains(requestParameters.FilterText.ToLower()));
 
-        else if (filterOptions.FilterBy.CheckStringEquality(PropertyNames["email"]))
-            users = users.Where(u => u.Email != null && u.Email.ToLower().Contains(filterOptions.FilterText.ToLower()));
+        else if (requestParameters.FilterBy.CheckStringEquality(PropertyNames["email"]))
+            users = users.Where(u => u.Email != null && u.Email.ToLower().Contains(requestParameters.FilterText.ToLower()));
     }
 
-    private static void OrderUsers(IQueryable<IUser> users, OrderOptions? orderOptions)
+    private static void OrderUsers(IQueryable<IUser> users, RequestParameters requestParameters)
     {
-        if (orderOptions == null || orderOptions.OrderBy == null)
+        if (requestParameters.OrderBy == null)
             return;
 
-        if (orderOptions.OrderBy.CheckStringEquality(PropertyNames["id"]))
+        if (requestParameters.OrderBy.CheckStringEquality(PropertyNames["id"]))
         {
-            users = orderOptions.OrderAscending == null || orderOptions.OrderAscending == true
+            users = requestParameters.OrderAscending == null || requestParameters.OrderAscending == true
                 ? users.OrderBy(u => u.Id)
                 : users.OrderByDescending(u => u.Id);
         }
 
-        if (orderOptions.OrderBy.CheckStringEquality(PropertyNames["name"]))
+        if (requestParameters.OrderBy.CheckStringEquality(PropertyNames["name"]))
         {
-            users = orderOptions.OrderAscending == null || orderOptions.OrderAscending == true
+            users = requestParameters.OrderAscending == null || requestParameters.OrderAscending == true
                 ? users.OrderBy(u => u.UserName)
                 : users.OrderByDescending(u => u.UserName);
         }
 
-        if (orderOptions.OrderBy.CheckStringEquality(PropertyNames["email"]))
+        if (requestParameters.OrderBy.CheckStringEquality(PropertyNames["email"]))
         {
-            users = orderOptions.OrderAscending == null || orderOptions.OrderAscending == true
+            users = requestParameters.OrderAscending == null || requestParameters.OrderAscending == true
                 ? users.OrderBy(u => u.Email)
                 : users.OrderByDescending(u => u.Email);
         }
 
-        if (orderOptions.OrderBy.CheckStringEquality(PropertyNames["profileId"]))
+        if (requestParameters.OrderBy.CheckStringEquality(PropertyNames["profileId"]))
         {
-            users = orderOptions.OrderAscending == null || orderOptions.OrderAscending == true
+            users = requestParameters.OrderAscending == null || requestParameters.OrderAscending == true
                 ? users.OrderBy(u => u.UserProfile.Id)
                 : users.OrderByDescending(u => u.UserProfile.Id);
         }
     }
 
     private async Task<PaginatedResponse<UserDto>> GetPaginatedResponseAsync(IQueryable<IUser> users,
-        PageOptions? pageOptions, CancellationToken cancellationToken)
+        RequestParameters requestParameters, CancellationToken cancellationToken)
     {
-        var response = new PaginatedResponse<UserDto>()
+        requestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
+        var response = new PaginatedResponse<UserDto>
         {
-            PageNumber = pageOptions?.PageNumber ?? 1,
-            PageSize = GetPageSize(pageOptions?.PageSize)
+            PageNumber = pageSize,
+            PageSize = pageNumber,
+            TotalPagesCount = await GetTotalPagesCountAsync(users, pageSize, cancellationToken)
         };
-        response.TotalPagesCount = await GetTotalPagesCountAsync(users, response.PageSize, cancellationToken);
 
-        users = users.Skip((response.PageNumber - 1) * response.PageSize).Take(response.PageSize);
+        users = users.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
         response.Elements = await GetUserDtosAsync(users, cancellationToken);
 
         return response;
-    }
-
-    private static int GetPageSize(int? pageSize)
-    {
-        if (pageSize == null)
-            return DefaultPageSize;
-
-        return pageSize.Value < MaxPageSize ? pageSize.Value : MaxPageSize;
     }
 
     private static async Task<int> GetTotalPagesCountAsync(IQueryable<IUser> users, int pageSize, CancellationToken cancellationToken)

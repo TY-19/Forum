@@ -10,12 +10,13 @@ public class ForumUserManager(UserManager<User> userManager) : IUserManager
 {
     public IQueryable<IUser> GetAllUsers()
     {
-        return userManager.Users.Include(u => u.UserProfile);
+        return userManager.Users.Include(u => u.UserProfile).AsNoTracking();
     }
     public async Task<IEnumerable<IUser>> GetAllUsersAsync(CancellationToken cancellationToken)
     {
         return await userManager.Users
             .Include(u => u.UserProfile)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 

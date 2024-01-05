@@ -1,4 +1,5 @@
-﻿using Forum.Application.Roles.Commands.CreateRole;
+﻿using Forum.Application.Common.Models;
+using Forum.Application.Roles.Commands.CreateRole;
 using Forum.Application.Roles.Commands.DeleteRole;
 using Forum.Application.Roles.Commands.UpdateRole;
 using Forum.Application.Roles.Commands.UpdateRolePermissions;
@@ -20,9 +21,17 @@ public class RolesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllRoles(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllRoles(int? pageSize, int? pageNumber,
+        bool? orderAscending, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllRolesRequest(), cancellationToken));
+        return Ok(await mediator.Send(new GetAllRolesRequest() { 
+            RequestParameters = new RequestParameters() 
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber,
+                OrderAscending = orderAscending,
+            }
+        }, cancellationToken));
     }
 
     [PermissionAuthorize(DefaultPermissions.CanCreateRole)]

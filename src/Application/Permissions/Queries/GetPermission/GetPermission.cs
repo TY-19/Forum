@@ -20,10 +20,10 @@ public class GetPermissionRequestHandler(IForumDbContext context,
         if (permission == null)
             return null;
 
-        List<string> rolesNames = (await roleManager.GetAllRolesAsync(cancellationToken))
+        List<string> rolesNames = await roleManager.GetAllRoles()
             .Where(r => permission.Roles.Any(pr => pr.IdentityRoleId == r.Id) && r.Name != null)
             .Select(r => r.Name!)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
         return new PermissionGetDto(permission, rolesNames);
     }

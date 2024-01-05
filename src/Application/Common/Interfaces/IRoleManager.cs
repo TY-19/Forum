@@ -5,6 +5,8 @@ namespace Forum.Application.Common.Interfaces;
 
 public interface IRoleManager
 {
+    IQueryable<IRole> GetAllRoles();
+
     Task<IEnumerable<IRole>> GetAllRolesAsync(CancellationToken cancellationToken);
     Task<IRole?> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken);
     Task<IRole?> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken);
