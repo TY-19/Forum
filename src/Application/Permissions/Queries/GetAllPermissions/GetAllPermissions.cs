@@ -5,10 +5,11 @@ using Forum.Application.Permissions.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Forum.Application.Permissions.Queries.GetAllPermissions;
 
-public class GetAllPermissionsRequest : IRequest<IEnumerable<PermissionGetDto>>
+public class GetAllPermissionsRequest : IRequest<PaginatedResponse<PermissionGetDto>>
 {
     public bool? FilterIsGlobal { get; set; }
     public int? FilterForumId { get; set; }
@@ -16,20 +17,31 @@ public class GetAllPermissionsRequest : IRequest<IEnumerable<PermissionGetDto>>
 }
 
 public class GetAllPermissionsRequestHandler(IForumDbContext context,
-    IRoleManager roleManager) : IRequestHandler<GetAllPermissionsRequest, IEnumerable<PermissionGetDto>>
+    IRoleManager roleManager) : IRequestHandler<GetAllPermissionsRequest, PaginatedResponse<PermissionGetDto>>
 {
-    public async Task<IEnumerable<PermissionGetDto>> Handle(GetAllPermissionsRequest request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<PermissionGetDto>> Handle(GetAllPermissionsRequest request, CancellationToken cancellationToken)
     {
         IQueryable<Permission> permissions = context.Permissions;
         permissions = FilterPermissions(permissions, request);
         permissions = OrderPermissions(permissions, request.RequestParameters);
-        permissions = PaginatePermissions(permissions, request.RequestParameters);
-        
+
+        request.RequestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
+        int pagesCount = await permissions.CountAsync(cancellationToken);
+
+        permissions = permissions.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+
         List<PermissionGetDto> dtos = [];
         var allRoles = await roleManager.GetAllRolesAsync(cancellationToken);
         (await permissions.ToListAsync(cancellationToken))
             .ForEach(p => dtos.Add(new PermissionGetDto(p, GetRoleNames(p, allRoles))));
-        return dtos;
+
+        return new PaginatedResponse<PermissionGetDto>()
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPagesCount = pagesCount,
+            Elements = dtos
+        };
     }
 
     private const int defaultPageSize = 10;
@@ -52,7 +64,7 @@ public class GetAllPermissionsRequestHandler(IForumDbContext context,
         {
             permissions = permissions.Where(p => p.IsGlobal == request.FilterIsGlobal);
         }
-        
+
         return permissions;
     }
 
@@ -64,12 +76,6 @@ public class GetAllPermissionsRequestHandler(IForumDbContext context,
             false => permissions.OrderByDescending(p => p.Name),
             _ => permissions
         };
-    }
-
-    private static IQueryable<Permission> PaginatePermissions(IQueryable<Permission> permissions, RequestParameters requestParameters)
-    {
-        requestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
-        return permissions.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
     }
 
     private List<string> GetRoleNames(Permission permission, IEnumerable<IRole> allRoles)

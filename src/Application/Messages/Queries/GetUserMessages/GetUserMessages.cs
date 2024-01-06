@@ -1,5 +1,8 @@
-﻿using Forum.Application.Common.Interfaces;
+﻿using Forum.Application.Common.Extensions;
+using Forum.Application.Common.Interfaces;
+using Forum.Application.Common.Models;
 using Forum.Application.Messages.Dtos;
+using Forum.Application.Permissions.Dtos;
 using Forum.Application.Permissions.Queries.CheckUserPermission;
 using Forum.Application.Permissions.Queries.GetUserPermissionScope;
 using Forum.Application.Users.Dtos;
@@ -10,34 +13,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Application.Messages.Queries.GetUserMessages;
 
-public class GetUserMessagesRequest : IRequest<IEnumerable<MessageDto>>
+public class GetUserMessagesRequest : IRequest<PaginatedResponse<MessageDto>>
 {
     public string UserName { get; set; } = null!;
     public int ProfileId { get; set; }
+    public RequestParameters RequestParameters { get; set; } = new();
 }
 
 public class GetUserMessagesRequestHandler(IForumDbContext context,
     IUserManager userManager,
-    IMediator mediator) : IRequestHandler<GetUserMessagesRequest, IEnumerable<MessageDto>>
+    IMediator mediator) : IRequestHandler<GetUserMessagesRequest, PaginatedResponse<MessageDto>>
 {
-    public async Task<IEnumerable<MessageDto>> Handle(GetUserMessagesRequest request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<MessageDto>> Handle(GetUserMessagesRequest request, CancellationToken cancellationToken)
     {
         var user = await userManager.GetUserByNameAsync(request.UserName, cancellationToken);
+
+
         if (user == null || user.UserProfile.Id != request.ProfileId
             || !await HasPermissionToReadUserMessagesAsync(user.Id, cancellationToken))
         {
-            return Enumerable.Empty<MessageDto>();
-        }
-
-        IQueryable<Message> messages = null!;
-        if (user.UserProfile.Id == request.ProfileId)
-        {
-            messages = context.UserProfiles
-                .Where(up => up.Id == request.ProfileId)
-                .Include(up => up.Messages)
-                .SelectMany(up => up.Messages)
-                .AsNoTracking();
-            return await GetMessageDtosAsync(await messages.ToListAsync(cancellationToken), user, cancellationToken);
+            return new PaginatedResponse<MessageDto>();
         }
 
         var scope = await mediator.Send(new GetUserPermissionScopeRequest()
@@ -46,11 +41,44 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
             UserId = user.Id,
         }, cancellationToken);
 
-        if (scope.IsGlobal)
+
+        if (scope == null)
         {
-            return await GetMessageDtosAsync(await messages.ToListAsync(cancellationToken), user, cancellationToken);
+            return new PaginatedResponse<MessageDto>();
         }
 
+        IQueryable<Message> messages = context.UserProfiles
+                .Where(up => up.Id == request.ProfileId)
+                .Include(up => up.Messages)
+                .SelectMany(up => up.Messages)
+                .OrderByDescending(up => up.Created)
+                .AsNoTracking();
+
+        if (user.UserProfile.Id == request.ProfileId || scope.IsGlobal)
+        {
+            return await GetPaginatedResponseAsync(request.RequestParameters, messages, user, cancellationToken);
+        }
+
+        messages = await GetMessagesInScopeAsync(messages, scope, cancellationToken);
+        return await GetPaginatedResponseAsync(request.RequestParameters, messages, user, cancellationToken);
+    }
+
+    private const int defaultPageSize = 10;
+    private const int maxPageSize = 100;
+
+    private async Task<bool> HasPermissionToReadUserMessagesAsync(string userId, CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(new CheckUserPermissionRequest()
+        {
+            PermissionName = DefaultPermissions.CanSeeUserMessages,
+            UserId = userId,
+        }, cancellationToken);
+        return response.Succeeded;
+    }
+
+    private async Task<IQueryable<Message>> GetMessagesInScopeAsync(IQueryable<Message> messages,
+        PermissionScopeDto scope, CancellationToken cancellationToken)
+    {
         var allowedForumIds = scope.ForumIds.ToList();
         var messageTopicIds = await messages.Select(m => m.TopicId).ToListAsync(cancellationToken);
 
@@ -62,18 +90,29 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
             .Select(t => t.Id)
             .ToListAsync(cancellationToken);
 
-        messages = messages.Where(m => allowedTopicIds.Contains(m.TopicId));
-        return await GetMessageDtosAsync(await messages.ToListAsync(cancellationToken), user, cancellationToken);
+        return messages.Where(m => allowedTopicIds.Contains(m.TopicId));
     }
 
-    private async Task<bool> HasPermissionToReadUserMessagesAsync(string userId, CancellationToken cancellationToken)
+    private async Task<PaginatedResponse<MessageDto>> GetPaginatedResponseAsync(RequestParameters requestParameters,
+        IQueryable<Message> messages, IUser user, CancellationToken cancellationToken)
     {
-        var response = await mediator.Send(new CheckUserPermissionRequest()
+        requestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
+        var response = new PaginatedResponse<MessageDto>()
         {
-            PermissionName = DefaultPermissions.CanSeeUserMessages,
-            UserId = userId,
-        }, cancellationToken);
-        return response.Succeeded;
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPagesCount = 0,
+            Elements = Enumerable.Empty<MessageDto>()
+        };
+
+        response.TotalPagesCount = await messages.CountAsync(cancellationToken);
+        var messagesList = await messages
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        response.Elements = await GetMessageDtosAsync(messagesList, user, cancellationToken);
+        return response;
     }
 
     private async Task<IEnumerable<MessageDto>> GetMessageDtosAsync(List<Message> messages, IUser user, CancellationToken cancellationToken)

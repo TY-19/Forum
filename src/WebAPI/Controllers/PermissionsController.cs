@@ -1,4 +1,5 @@
-﻿using Forum.Application.Permissions.Commands.CreatePermission;
+﻿using Forum.Application.Common.Models;
+using Forum.Application.Permissions.Commands.CreatePermission;
 using Forum.Application.Permissions.Commands.DeletePermission;
 using Forum.Application.Permissions.Commands.UpdatePermission;
 using Forum.Application.Permissions.Dtos;
@@ -20,12 +21,13 @@ public class PermissionsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<PermissionGetDto>>> GetAllPermissions(
-        bool? filterGlobal, int? forumId, string? filterText, int? pageSize, int? page, 
+    public async Task<ActionResult<PaginatedResponse<PermissionGetDto>>> GetAllPermissions(
+        bool? filterGlobal, int? forumId, string? filterText, int? pageSize, int? page,
         bool? orderAscending, CancellationToken cancellationToken)
     {
-        var request = new GetAllPermissionsRequest() { 
-            FilterIsGlobal = filterGlobal, 
+        var request = new GetAllPermissionsRequest()
+        {
+            FilterIsGlobal = filterGlobal,
             FilterForumId = forumId,
             RequestParameters = new()
             {

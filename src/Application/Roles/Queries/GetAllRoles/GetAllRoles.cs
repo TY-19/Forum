@@ -7,24 +7,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Application.Roles.Queries.GetAllRoles;
 
-public class GetAllRolesRequest : IRequest<IEnumerable<RoleDto>>
+public class GetAllRolesRequest : IRequest<PaginatedResponse<RoleDto>>
 {
     public RequestParameters RequestParameters { get; set; } = new();
 }
 
-public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandler<GetAllRolesRequest, IEnumerable<RoleDto>>
+public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandler<GetAllRolesRequest, PaginatedResponse<RoleDto>>
 {
-    public async Task<IEnumerable<RoleDto>> Handle(GetAllRolesRequest request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<RoleDto>> Handle(GetAllRolesRequest request, CancellationToken cancellationToken)
     {
         request.RequestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
+
         var roles = roleManager.GetAllRoles()
             .Where(r => r.Name != null)
             .Select(r => new RoleDto() { RoleName = r.Name! });
         roles = OrderRoles(roles, request.RequestParameters);
-        return await roles
-            .Skip(pageSize * (pageNumber - 1))
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        return new PaginatedResponse<RoleDto>()
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPagesCount = await roles.CountAsync(cancellationToken),
+            Elements = await roles
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync(cancellationToken)
+        };
     }
 
     private const int defaultPageSize = 10;

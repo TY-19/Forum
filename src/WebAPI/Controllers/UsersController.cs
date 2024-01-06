@@ -25,10 +25,11 @@ public class UsersController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(int? page, int? size,
+    public async Task<ActionResult<PaginatedResponse<UserDto>>> GetAllUsers(int? page, int? size,
         string? filterBy, string? filterText, string? orderBy, bool? orderAsc, CancellationToken cancellationToken)
     {
-        var requestParameters = new RequestParameters() {
+        var requestParameters = new RequestParameters()
+        {
             PageNumber = page,
             PageSize = size,
             FilterBy = filterBy,
@@ -36,8 +37,10 @@ public class UsersController(IMediator mediator) : ControllerBase
             OrderBy = orderBy,
             OrderAscending = orderAsc
         };
-        return Ok(await mediator.Send(new GetAllUsersRequest() {
-            RequestParameters = requestParameters }, cancellationToken));
+        return Ok(await mediator.Send(new GetAllUsersRequest()
+        {
+            RequestParameters = requestParameters
+        }, cancellationToken));
     }
 
     [PermissionAuthorize(DefaultPermissions.CanGetUserInfo)]
@@ -133,12 +136,18 @@ public class UsersController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<MessageDto>>> GetUserMessages(int profileId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MessageDto>>> GetUserMessages(int profileId,
+        int? pageSize, int? page, CancellationToken cancellationToken)
     {
         var command = new GetUserMessagesRequest()
         {
             ProfileId = profileId,
             UserName = User.Identity?.Name ?? "",
+            RequestParameters = new()
+            {
+                PageSize = pageSize,
+                PageNumber = page
+            }
         };
         return Ok(await mediator.Send(command, cancellationToken));
     }

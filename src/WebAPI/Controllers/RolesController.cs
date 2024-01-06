@@ -21,11 +21,12 @@ public class RolesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<RoleDto>>> GetAllRoles(int? pageSize, int? pageNumber,
+    public async Task<ActionResult<PaginatedResponse<RoleDto>>> GetAllRoles(int? pageSize, int? pageNumber,
         bool? orderAscending, CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetAllRolesRequest() { 
-            RequestParameters = new RequestParameters() 
+        return Ok(await mediator.Send(new GetAllRolesRequest()
+        {
+            RequestParameters = new RequestParameters()
             {
                 PageSize = pageSize,
                 PageNumber = pageNumber,

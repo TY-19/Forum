@@ -33,16 +33,7 @@ public class GetForumRequestHandler(IForumDbContext context) : IRequestHandler<G
             .Where(f => f.ParentForumId == parentForumId)
             .Include(f => f.Subforums)
             .Include(f => f.Topics)
-            .Select(f => new SubforumDto()
-            {
-                Id = f.Id,
-                Name = f.Name,
-                ParentForumId = f.ParentForumId,
-                Category = f.Category,
-                Description = f.Description,
-                SubforumsCount = f.Subforums.Count(),
-                TopicsCount = f.Topics.Count()
-            })
+            .Select(f => new SubforumDto(f))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
@@ -53,32 +44,7 @@ public class GetForumRequestHandler(IForumDbContext context) : IRequestHandler<G
             .Where(f => f.Id == id)
             .Include(f => f.Subforums)
             .Include(f => f.Topics)
-            .Select(f => new ForumDto()
-            {
-                Id = f.Id,
-                Name = f.Name,
-                ParentForumId = f.ParentForumId,
-                Category = f.Category,
-                Description = f.Description,
-                Subcategories = f.Subforums.Select(f => f.Category).Distinct(),
-                Subforums = f.Subforums.Select(s => new SubforumDto()
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    ParentForumId = s.ParentForumId,
-                    Category = s.Category,
-                    Description = s.Description,
-                    SubforumsCount = s.Subforums.Count(),
-                    TopicsCount = s.Topics.Count()
-                }),
-                Topics = f.Topics.Select(t => new TopicForumDto()
-                {
-                    Id = t.Id,
-                    Title = t.Title,
-                    ParentForumId = t.ParentForumId,
-                    MessagesCount = t.Messages.Count()
-                })
-            })
+            .Select(f => new ForumDto(f))
             .FirstOrDefaultAsync(cancellationToken);
     }
 }
