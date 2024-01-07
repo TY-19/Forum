@@ -1,10 +1,13 @@
-﻿using Forum.Application.Permissions.Queries.CheckUserPermission;
+﻿using Forum.Application.Common.Models;
+using Forum.Application.Permissions.Queries.CheckUserPermission;
 using Forum.Application.Topics.Commands.CreateTopic;
 using Forum.Application.Topics.Commands.DeleteTopic;
 using Forum.Application.Topics.Commands.MoveTopic;
 using Forum.Application.Topics.Commands.UpdateTopic;
 using Forum.Application.Topics.Dtos;
 using Forum.Application.Topics.Queries.GetTopic;
+using Forum.Application.UnreadElements.Commands.GetUnreadTopics;
+using Forum.Application.UnreadElements.Dtos;
 using Forum.Domain.Constants;
 using Forum.WebAPI.Configurations.Authorization;
 using MediatR;
@@ -16,6 +19,28 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class TopicsController(IMediator mediator) : ControllerBase
 {
+    [PermissionAuthorize(DefaultPermissions.CanReadTopic)]
+    [Route("~/api/unread")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<PaginatedResponse<UnreadElementDto>>> GetUnreadTopics(
+        int? pageSize, int? page, CancellationToken cancellationToken)
+    {
+        var command = new GetUnreadTopicsCommand()
+        {
+            UserName = User.Identity?.Name,
+            RequestParameters = new RequestParameters()
+            {
+                PageSize = pageSize,
+                PageNumber = page
+            }
+        };
+
+        return Ok(await mediator.Send(command, cancellationToken));
+    }
+
     [PermissionAuthorize(DefaultPermissions.CanReadTopic)]
     [HttpGet]
     [Route("{topicId}")]

@@ -26,7 +26,7 @@ public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandl
         {
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalPagesCount = await roles.CountAsync(cancellationToken),
+            TotalPagesCount = (int)Math.Ceiling(await roles.CountAsync(cancellationToken) / (double)pageSize),
             Elements = await roles
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)

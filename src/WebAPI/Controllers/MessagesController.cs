@@ -21,9 +21,9 @@ public class MessagesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<MessageDto>> GetMessage(int messageId)
+    public async Task<ActionResult<MessageDto>> GetMessage(int messageId, CancellationToken cancellationToken)
     {
-        var message = await mediator.Send(new GetMessageRequest() { Id = messageId });
+        var message = await mediator.Send(new GetMessageRequest() { Id = messageId }, cancellationToken);
         return message == null ? NotFound() : Ok(message);
     }
 

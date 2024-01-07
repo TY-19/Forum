@@ -1,5 +1,6 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Forums.Dtos;
+using Forum.Application.UnreadElements.Commands.SetUnreadStatusCommand;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,24 +8,34 @@ namespace Forum.Application.Forums.Queries.GetForum;
 
 public class GetForumRequest : IRequest<ForumDto>
 {
+    public string? UserName { get; set; }
     public int? ForumId { get; set; }
     public int? ParentForumId { get; set; }
 }
 
-public class GetForumRequestHandler(IForumDbContext context) : IRequestHandler<GetForumRequest, ForumDto?>
+public class GetForumRequestHandler(IForumDbContext context,
+    IMediator mediator) : IRequestHandler<GetForumRequest, ForumDto?>
 {
     public async Task<ForumDto?> Handle(GetForumRequest request, CancellationToken cancellationToken)
     {
+        ForumDto? forumDto;
         if (request.ForumId == null && request.ParentForumId == null)
         {
-            return new ForumDto()
+            forumDto = new()
             {
                 Subforums = await GetSubforumsAsync(request.ParentForumId, cancellationToken)
             };
         }
-        int id = request.ForumId == null ? (int)request.ParentForumId! : (int)request.ForumId;
-
-        return await GetForumDtoAsync(id, cancellationToken);
+        else
+        {
+            int id = request.ForumId == null ? (int)request.ParentForumId! : (int)request.ForumId;
+            forumDto = await GetForumDtoAsync(id, cancellationToken);
+        }
+        return await mediator.Send(new SetUnreadStatusCommand()
+        {
+            UserName = request.UserName,
+            ForumDto = forumDto
+        }, cancellationToken);
     }
 
     private async Task<IEnumerable<SubforumDto>> GetSubforumsAsync(int? parentForumId, CancellationToken cancellationToken)

@@ -9,6 +9,7 @@ public class SubforumDto
     public int? ParentForumId { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
+    public bool IsUnread { get; set; }
     public int SubforumsCount { get; set; }
     public int TopicsCount { get; set; }
 

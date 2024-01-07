@@ -35,7 +35,7 @@ public class GetTopicRequestHandler(IForumDbContext context,
                 {
                     PageSize = pageSize,
                     PageNumber = pageNumber,
-                    TotalPagesCount = t.Messages.Count(),
+                    TotalPagesCount = (int)Math.Ceiling(t.Messages.Count() / (double)pageSize),
                     Elements = t.Messages
                         .Skip(pageSize * (pageNumber - 1))
                         .Take(pageSize)

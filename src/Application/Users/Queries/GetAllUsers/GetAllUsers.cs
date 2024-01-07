@@ -93,7 +93,7 @@ public class GetAllUsersRequestHandler(IUserManager userManager) : IRequestHandl
         {
             PageNumber = pageSize,
             PageSize = pageNumber,
-            TotalPagesCount = await GetTotalPagesCountAsync(users, pageSize, cancellationToken)
+            TotalPagesCount = (int)Math.Ceiling(await users.CountAsync(cancellationToken) / (double)pageSize)
         };
 
         users = users.Skip((pageNumber - 1) * pageSize).Take(pageSize);
@@ -101,13 +101,6 @@ public class GetAllUsersRequestHandler(IUserManager userManager) : IRequestHandl
         response.Elements = await GetUserDtosAsync(users, cancellationToken);
 
         return response;
-    }
-
-    private static async Task<int> GetTotalPagesCountAsync(IQueryable<IUser> users, int pageSize, CancellationToken cancellationToken)
-    {
-        var count = await users.CountAsync(cancellationToken);
-        var totalPages = count / pageSize;
-        return totalPages * pageSize == count ? totalPages : totalPages + 1;
     }
 
     private async Task<IEnumerable<UserDto>> GetUserDtosAsync(IQueryable<IUser> users, CancellationToken cancellationToken)

@@ -101,11 +101,10 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
         {
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalPagesCount = 0,
+            TotalPagesCount = (int)Math.Ceiling(await messages.CountAsync(cancellationToken) / (double)pageSize),
             Elements = Enumerable.Empty<MessageDto>()
         };
 
-        response.TotalPagesCount = await messages.CountAsync(cancellationToken);
         var messagesList = await messages
             .Skip(pageSize * (pageNumber - 1))
             .Take(pageSize)

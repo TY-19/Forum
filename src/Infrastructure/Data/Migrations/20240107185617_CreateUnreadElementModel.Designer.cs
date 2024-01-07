@@ -4,6 +4,7 @@ using Forum.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Forum.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240107185617_CreateUnreadElementModel")]
+    partial class CreateUnreadElementModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +190,11 @@ namespace Forum.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MessageId");
+                    b.HasIndex("MessageId")
+                        .IsUnique();
 
-                    b.HasIndex("TopicId");
+                    b.HasIndex("TopicId")
+                        .IsUnique();
 
                     b.HasIndex("UserProfileId");
 
@@ -480,14 +485,14 @@ namespace Forum.Infrastructure.Data.Migrations
             modelBuilder.Entity("Forum.Domain.Entities.UnreadElement", b =>
                 {
                     b.HasOne("Forum.Domain.Entities.Message", "Message")
-                        .WithMany()
-                        .HasForeignKey("MessageId")
+                        .WithOne()
+                        .HasForeignKey("Forum.Domain.Entities.UnreadElement", "MessageId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Forum.Domain.Entities.Topic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId")
+                        .WithOne()
+                        .HasForeignKey("Forum.Domain.Entities.UnreadElement", "TopicId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

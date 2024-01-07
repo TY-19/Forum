@@ -11,6 +11,7 @@ public interface IForumDbContext
     DbSet<UserProfile> UserProfiles { get; }
     DbSet<ApplicationRole> ApplicationRoles { get; }
     DbSet<Permission> Permissions { get; }
+    DbSet<UnreadElement> UnreadElements { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -12,5 +12,9 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.HasMany(x => x.Messages)
             .WithOne()
             .HasForeignKey(m => m.UserProfileId);
+        builder.HasMany(x => x.UnreadTopics)
+            .WithOne()
+            .HasForeignKey(x => x.UserProfileId);
+
     }
 }

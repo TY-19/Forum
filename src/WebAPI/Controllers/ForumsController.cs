@@ -21,7 +21,11 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ForumDto>> GetTopLevelForums(CancellationToken cancellationToken)
     {
-        return Ok(await mediator.Send(new GetForumRequest() { ParentForumId = null }, cancellationToken));
+        return Ok(await mediator.Send(new GetForumRequest()
+        {
+            UserName = User.Identity?.Name,
+            ParentForumId = null
+        }, cancellationToken));
     }
 
     [PermissionAuthorize(DefaultPermissions.CanReadForum)]
@@ -33,7 +37,11 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ForumDto>> GetForum(int forumId, CancellationToken cancellationToken)
     {
-        var forum = await mediator.Send(new GetForumRequest() { ForumId = forumId }, cancellationToken);
+        var forum = await mediator.Send(new GetForumRequest()
+        {
+            UserName = User.Identity?.Name,
+            ForumId = forumId
+        }, cancellationToken);
         return forum == null ? NotFound() : Ok(forum);
     }
 

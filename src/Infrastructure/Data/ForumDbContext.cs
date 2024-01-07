@@ -15,6 +15,7 @@ public class ForumDbContext(DbContextOptions<ForumDbContext> options) : Identity
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<ApplicationRole> ApplicationRoles => Set<ApplicationRole>();
     public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<UnreadElement> UnreadElements => Set<UnreadElement>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

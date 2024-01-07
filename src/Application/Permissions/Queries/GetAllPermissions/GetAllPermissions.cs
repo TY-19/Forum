@@ -26,7 +26,7 @@ public class GetAllPermissionsRequestHandler(IForumDbContext context,
         permissions = OrderPermissions(permissions, request.RequestParameters);
 
         request.RequestParameters.SetPageOptions(defaultPageSize, maxPageSize, out int pageSize, out int pageNumber);
-        int pagesCount = await permissions.CountAsync(cancellationToken);
+        int pagesCount = (int)Math.Ceiling(await permissions.CountAsync(cancellationToken) / (double)pageSize);
 
         permissions = permissions.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
 
