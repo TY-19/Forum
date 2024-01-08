@@ -8,35 +8,36 @@ namespace Forum.Application.UnreadElements.Commands.SetUnreadStatusCommand;
 
 public class SetUnreadStatusCommand : IRequest<ForumDto?>
 {
-    public string? UserName { get; set; }
     public ForumDto? ForumDto { get; set; }
 }
 
 public class SetUnreadStatusCommandHandler(IForumDbContext context,
     IUserManager userManager,
+    ICurrentUserService currentUserService,
     IMediator mediator) : IRequestHandler<SetUnreadStatusCommand, ForumDto?>
 {
     public async Task<ForumDto?> Handle(SetUnreadStatusCommand command, CancellationToken cancellationToken)
     {
-        if (command.UserName == null || command.ForumDto == null)
+        var userName = currentUserService.GetCurrentUserName();
+        if (userName == null || command.ForumDto == null)
             return command.ForumDto;
 
-        var profileId = (await userManager.GetUserByNameAsync(command.UserName, cancellationToken))?.UserProfile.Id;
-        if (profileId == null)
+        var user = await userManager.GetUserByNameAsync(userName, cancellationToken);
+        if (user?.UserProfile == null)
             return command.ForumDto;
 
         await mediator.Send(new SynchronizeUnreadListCommand()
         {
-            ProfileId = profileId.Value
+            ProfileId = user.UserProfile.Id
         }, cancellationToken);
 
         if (command.ForumDto.Subforums.Any())
         {
-            await SetSubforumUnreadStatusAsync(profileId.Value, command.ForumDto, cancellationToken);
+            await SetSubforumUnreadStatusAsync(user.UserProfile.Id, command.ForumDto, cancellationToken);
         }
         if (command.ForumDto.Topics.Any())
         {
-            await SetTopicsUnreadStatusAsync(profileId.Value, command.ForumDto, cancellationToken);
+            await SetTopicsUnreadStatusAsync(user.UserProfile.Id, command.ForumDto, cancellationToken);
         }
 
         return command.ForumDto;

@@ -8,7 +8,6 @@ namespace Forum.Application.Forums.Queries.GetForum;
 
 public class GetForumRequest : IRequest<ForumDto>
 {
-    public string? UserName { get; set; }
     public int? ForumId { get; set; }
     public int? ParentForumId { get; set; }
 }
@@ -31,11 +30,7 @@ public class GetForumRequestHandler(IForumDbContext context,
             int id = request.ForumId == null ? (int)request.ParentForumId! : (int)request.ForumId;
             forumDto = await GetForumDtoAsync(id, cancellationToken);
         }
-        return await mediator.Send(new SetUnreadStatusCommand()
-        {
-            UserName = request.UserName,
-            ForumDto = forumDto
-        }, cancellationToken);
+        return await mediator.Send(new SetUnreadStatusCommand() { ForumDto = forumDto }, cancellationToken);
     }
 
     private async Task<IEnumerable<SubforumDto>> GetSubforumsAsync(int? parentForumId, CancellationToken cancellationToken)

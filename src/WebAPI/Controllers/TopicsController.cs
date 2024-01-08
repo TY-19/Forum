@@ -48,9 +48,19 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TopicDto>> GetTopic(int forumId, int topicId, CancellationToken cancellationToken)
+    public async Task<ActionResult<TopicDto>> GetTopic(int forumId, int topicId,
+        int? pageSize, int? page, CancellationToken cancellationToken)
     {
-        var topic = await mediator.Send(new GetTopicRequest() { Id = topicId }, cancellationToken);
+        var request = new GetTopicRequest()
+        {
+            Id = topicId,
+            RequestParameters = new RequestParameters()
+            {
+                PageSize = pageSize,
+                PageNumber = page
+            }
+        };
+        var topic = await mediator.Send(request, cancellationToken);
         return topic?.ParentForumId == forumId ? Ok(topic) : NotFound();
     }
 

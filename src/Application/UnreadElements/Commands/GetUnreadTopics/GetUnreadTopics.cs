@@ -75,6 +75,7 @@ public class GetUnreadTopicsCommandHandler(IForumDbContext context,
             var dto = new UnreadElementDto()
             {
                 TopicId = unread.TopicId,
+                ParentForumId = unread.Topic?.ParentForumId ?? 0,
                 Title = unread.Topic?.Title ?? "",
                 MessageId = unread.MessageId,
                 Created = unread.Message.Created,

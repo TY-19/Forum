@@ -3,6 +3,7 @@ using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using Forum.Application.Messages.Dtos;
 using Forum.Application.Topics.Dtos;
+using Forum.Application.UnreadElements.Commands.MarkTopicsAsRead;
 using Forum.Application.Users.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,9 @@ public class GetTopicRequest : IRequest<TopicDto?>
 }
 
 public class GetTopicRequestHandler(IForumDbContext context,
-    IUserManager userManager) : IRequestHandler<GetTopicRequest, TopicDto?>
+    IUserManager userManager,
+    ICurrentUserService currentUserService,
+    IMediator mediator) : IRequestHandler<GetTopicRequest, TopicDto?>
 {
     public async Task<TopicDto?> Handle(GetTopicRequest request, CancellationToken cancellationToken)
     {
@@ -57,6 +60,7 @@ public class GetTopicRequestHandler(IForumDbContext context,
             return null;
 
         await PopulateUsersWithRoles(topicDto, cancellationToken);
+        await MarkReturningMessagesAsReadAsync(topicDto, cancellationToken);
 
         return topicDto;
     }
@@ -78,5 +82,21 @@ public class GetTopicRequestHandler(IForumDbContext context,
 
             userDto.Roles = await userManager.GetRolesAsync(user, cancellationToken);
         }
+    }
+
+    private async Task MarkReturningMessagesAsReadAsync(TopicDto topicDto, CancellationToken cancellationToken)
+    {
+        string? userName = currentUserService.GetCurrentUserName();
+        if (userName == null)
+            return;
+
+        var command = new MarkTopicAsReadCommand()
+        {
+            UserName = userName,
+            TopicId = topicDto.Id,
+            ReadToMessageId = topicDto.Messages.Elements.Max(m => m.Id)
+        };
+
+        await mediator.Send(command, cancellationToken);
     }
 }

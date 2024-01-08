@@ -1,5 +1,7 @@
-﻿using Forum.WebAPI.Configurations.Authorization;
+﻿using Forum.Application.Common.Interfaces;
+using Forum.WebAPI.Configurations.Authorization;
 using Forum.WebAPI.Infrastructure;
+using Forum.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -42,6 +44,7 @@ public static class DependencyInjection
         services.AddTransient<IAuthorizationHandler, PermissionHandler>();
         services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 
         services.AddControllers()
