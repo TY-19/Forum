@@ -1,7 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
-using Forum.Application.Messages.Dtos;
 using Forum.Application.Permissions.Queries.CheckUserPermission;
+using Forum.Application.Topics.Queries.CheckIfTopicIsOpen;
 using Forum.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,22 +25,25 @@ public class UpdateMessageCommandHandler(IForumDbContext context, IUserManager u
         var topic = await context.Topics
             .FirstOrDefaultAsync(t => t.Id == command.TopicId && t.ParentForumId == command.ForumId, cancellationToken);
         if (topic == null)
-            return new CustomResponse<MessageDto>() { Succeeded = false, Message = $"There are no topic with id {command.TopicId} in the forum with id {command.ForumId}" };
+            return new CustomResponse() { Succeeded = false, Message = $"There are no topic with id {command.TopicId} in the forum with id {command.ForumId}" };
+
+        if (!await mediator.Send(new CheckIfTopicIsOpenRequest() { ForumId = command.ForumId, TopicId = command.TopicId }, cancellationToken))
+            return new CustomResponse() { Succeeded = false, Message = "The message cannot be updated because the topic/forum is closed" };
 
         var message = await context.Messages
             .FirstOrDefaultAsync(m => m.Id == command.MessageId && m.TopicId == command.TopicId, cancellationToken);
 
         if (message == null)
-            return new CustomResponse<MessageDto>() { Succeeded = false, Message = $"There are no message with id {command.MessageId} in the topic with id {command.TopicId}" };
+            return new CustomResponse() { Succeeded = false, Message = $"There are no message with id {command.MessageId} in the topic with id {command.TopicId}" };
 
         var user = await userManager.GetUserByNameAsync(command.UserName, cancellationToken);
         if (user == null)
-            return new CustomResponse<MessageDto>() { Succeeded = false, Message = $"There are no user with such a name" };
+            return new CustomResponse() { Succeeded = false, Message = $"There are no user with such a name" };
 
         if (user.UserProfile.Id != message.UserProfileId
             && !await HasPermissionToUpdateMessage(command.ForumId, user.Id, cancellationToken))
         {
-            return new CustomResponse<MessageDto>() { Succeeded = false, Message = $"You have no permission to update the message" };
+            return new CustomResponse() { Succeeded = false, Message = $"You have no permission to update the message" };
         }
 
         message.Text = command.Text;

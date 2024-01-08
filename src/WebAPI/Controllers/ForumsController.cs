@@ -67,6 +67,42 @@ public class ForumsController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
+    [PermissionAuthorize(DefaultPermissions.CanCloseForum)]
+    [HttpPut]
+    [Route("{forumId}/close")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult> CloseForum(int forumId, CancellationToken cancellationToken)
+    {
+        return await ChangeForumStatus(forumId, true, cancellationToken);
+    }
+
+    [PermissionAuthorize(DefaultPermissions.CanOpenForum)]
+    [HttpPut]
+    [Route("{forumId}/open")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult> OpenForum(int forumId, CancellationToken cancellationToken)
+    {
+        return await ChangeForumStatus(forumId, false, cancellationToken);
+    }
+
+    private async Task<ActionResult> ChangeForumStatus(int forumId, bool isClosed, CancellationToken cancellationToken)
+    {
+        var command = new UpdateForumCommand()
+        {
+            Id = forumId,
+            IsClosed = isClosed
+        };
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+    }
+
     [PermissionAuthorize(DefaultPermissions.CanDeleteForum)]
     [HttpDelete]
     [Route("{forumId}")]

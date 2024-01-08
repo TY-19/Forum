@@ -6,6 +6,6 @@ public class UpdateTopicCommandValidator : AbstractValidator<UpdateTopicCommand>
 {
     public UpdateTopicCommandValidator()
     {
-        RuleFor(c => c.Title).NotEmpty().MaximumLength(500);
+        RuleFor(c => c.Title).MaximumLength(500);
     }
 }

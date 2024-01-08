@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using Forum.Application.Messages.Dtos;
+using Forum.Application.Topics.Queries.CheckIfTopicIsOpen;
 using Forum.Application.Users.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
@@ -17,7 +18,8 @@ public class CreateMessageCommand : IRequest<CustomResponse<MessageDto>>
 }
 
 public class CreateMessageCommandHandler(IForumDbContext context,
-    IUserManager userManager) : IRequestHandler<CreateMessageCommand, CustomResponse<MessageDto>>
+    IUserManager userManager,
+    IMediator mediator) : IRequestHandler<CreateMessageCommand, CustomResponse<MessageDto>>
 {
     public async Task<CustomResponse<MessageDto>> Handle(CreateMessageCommand command, CancellationToken cancellationToken)
     {
@@ -25,6 +27,9 @@ public class CreateMessageCommandHandler(IForumDbContext context,
             .FirstOrDefaultAsync(t => t.Id == command.TopicId && t.ParentForumId == command.ForumId, cancellationToken);
         if (topic == null)
             return new CustomResponse<MessageDto>() { Succeeded = false, Message = $"There are no topic with id {command.TopicId} in forum with id {command.ForumId}" };
+
+        if (!await mediator.Send(new CheckIfTopicIsOpenRequest() { ForumId = command.ForumId, TopicId = command.TopicId }, cancellationToken))
+            return new CustomResponse<MessageDto>() { Succeeded = false, Message = "The message cannot be created in the closed topic/forum" };
 
         var user = await userManager.GetUserByNameAsync(command.UserName, cancellationToken);
         if (user == null)

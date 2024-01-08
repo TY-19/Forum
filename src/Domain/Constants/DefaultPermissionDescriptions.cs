@@ -5,12 +5,16 @@ public static class DefaultPermissionDescriptions
     public const string CanReadForum = "Can read a forum";
     public const string CanCreateForum = "Can create a forum";
     public const string CanUpdateForum = "Can update a forum";
+    public const string CanCloseForum = "Can close a forum";
+    public const string CanOpenForum = "Can open a forum";
     public const string CanDeleteForum = "Can delete a forum";
 
     public const string CanReadTopic = "Can read a topic";
     public const string CanCreateTopic = "Can create a topic";
     public const string CanUpdateTopic = "Can update a topic";
     public const string CanMoveTopic = "Can move a topic";
+    public const string CanCloseTopic = "Can close a topic";
+    public const string CanOpenTopic = "Can open a topic";
     public const string CanDeleteTopic = "Can delete a topic";
 
     public const string CanReadMessage = "Can read messages";

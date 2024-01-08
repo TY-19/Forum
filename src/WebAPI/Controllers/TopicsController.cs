@@ -78,7 +78,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetTopic), new { forumId, topicId = response.Payload.Id }, response.Payload)
-            : BadRequest();
+            : BadRequest(response.Message);
     }
 
     [PermissionAuthorize(DefaultPermissions.CanUpdateTopic)]
@@ -88,10 +88,14 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult> UpdateTopic(int topicId, UpdateTopicCommand command, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateTopic(int forumId, int topicId, TopicPutDto topicPutDto, CancellationToken cancellationToken)
     {
-        if (topicId != command.Id)
-            return BadRequest();
+        var command = new UpdateTopicCommand()
+        {
+            ForumId = forumId,
+            TopicId = topicId,
+            Title = topicPutDto.Title,
+        };
 
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
@@ -104,7 +108,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult> MoveTopicToAnotherForum(int topicId, int newForumId, CancellationToken cancellationToken)
+    public async Task<ActionResult> MoveTopicToAnotherForum(int forumId, int topicId, int newForumId, CancellationToken cancellationToken)
     {
         var checkUserPermissionForDestination = await mediator.Send(
             new CheckUserPermissionRequest
@@ -117,7 +121,51 @@ public class TopicsController(IMediator mediator) : ControllerBase
         if (!checkUserPermissionForDestination.Succeeded)
             return Forbid();
 
-        var response = await mediator.Send(new MoveTopicCommand() { Id = topicId, NewParentForumId = newForumId }, cancellationToken);
+        var command = new MoveTopicCommand()
+        {
+            Id = topicId,
+            OldParentForumId = forumId,
+            NewParentForumId = newForumId
+        };
+
+        var response = await mediator.Send(command, cancellationToken);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+    }
+
+    [PermissionAuthorize(DefaultPermissions.CanCloseTopic)]
+    [HttpPut]
+    [Route("{topicId}/close")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult> CloseTopic(int forumId, int topicId, CancellationToken cancellationToken)
+    {
+        return await ChangeTopicStatus(forumId, topicId, true, cancellationToken);
+    }
+
+    [PermissionAuthorize(DefaultPermissions.CanOpenTopic)]
+    [HttpPut]
+    [Route("{topicId}/open")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult> OpenTopic(int forumId, int topicId, CancellationToken cancellationToken)
+    {
+        return await ChangeTopicStatus(forumId, topicId, false, cancellationToken);
+    }
+
+    private async Task<ActionResult> ChangeTopicStatus(int forumId, int topicId, bool isClosed, CancellationToken cancellationToken)
+    {
+        var command = new UpdateTopicCommand()
+        {
+            ForumId = forumId,
+            TopicId = topicId,
+            IsClosed = isClosed
+        };
+
+        var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 

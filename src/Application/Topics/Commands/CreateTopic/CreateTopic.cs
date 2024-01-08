@@ -1,5 +1,6 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
+using Forum.Application.Forums.Queries.CheckIfForumIsOpen;
 using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
@@ -12,10 +13,14 @@ public class CreateTopicCommand : IRequest<CustomResponse<TopicDto>>
     public int? ParentForumId { get; set; }
 }
 
-public class CreateTopicCommandHandler(IForumDbContext context) : IRequestHandler<CreateTopicCommand, CustomResponse<TopicDto>>
+public class CreateTopicCommandHandler(IForumDbContext context,
+    IMediator mediator) : IRequestHandler<CreateTopicCommand, CustomResponse<TopicDto>>
 {
     public async Task<CustomResponse<TopicDto>> Handle(CreateTopicCommand command, CancellationToken cancellationToken)
     {
+        if (!await mediator.Send(new CheckIfForumIsOpenRequest() { ForumId = command.ParentForumId }, cancellationToken))
+            return new CustomResponse<TopicDto>() { Succeeded = false, Message = "Forum is closed from creating new topics" };
+
         var topic = new Topic() { Title = command.Title, ParentForumId = command.ParentForumId };
 
         try

@@ -29,11 +29,13 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanReadForum,
         DefaultPermissions.CanCreateForum,
         DefaultPermissions.CanUpdateForum,
+        DefaultPermissions.CanCloseForum,
 
         DefaultPermissions.CanReadTopic,
         DefaultPermissions.CanCreateTopic,
         DefaultPermissions.CanMoveTopic,
         DefaultPermissions.CanUpdateTopic,
+        DefaultPermissions.CanCloseTopic,
         DefaultPermissions.CanDeleteTopic,
 
         DefaultPermissions.CanReadMessage,

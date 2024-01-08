@@ -11,6 +11,7 @@ public class UpdateForumCommand : IRequest<CustomResponse>
     public int Id { get; set; }
     public string? Name { get; set; }
     public int? ParentForumId { get; set; }
+    public bool? IsClosed { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
 }
@@ -48,7 +49,10 @@ public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandle
         {
             forum.Name = command.Name;
         }
-        forum.ParentForumId = command.ParentForumId;
+        if (command.ParentForumId != null)
+        {
+            forum.ParentForumId = command.ParentForumId;
+        }
         if (command.Category != null)
         {
             forum.Category = command.Category;
@@ -56,6 +60,10 @@ public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandle
         if (command.Description != null)
         {
             forum.Description = command.Description;
+        }
+        if (command.IsClosed != null)
+        {
+            forum.IsClosed = command.IsClosed.Value;
         }
     }
 }

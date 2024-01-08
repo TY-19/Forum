@@ -34,6 +34,7 @@ public class GetTopicRequestHandler(IForumDbContext context,
                 Id = t.Id,
                 Title = t.Title,
                 ParentForumId = t.ParentForumId,
+                IsClosed = t.IsClosed,
                 Messages = new PaginatedResponse<MessageDto>
                 {
                     PageSize = pageSize,
