@@ -8,6 +8,7 @@ public static class DefaultPermissions
     public const string CanCloseForum = "CanCloseForum";
     public const string CanOpenForum = "CanOpenForum";
     public const string CanDeleteForum = "CanDeleteForum";
+    public const string CanSearchForForums = "CanSearchForForums";
 
     public const string CanReadTopic = "CanReadTopic";
     public const string CanCreateTopic = "CanCreateTopic";
@@ -16,6 +17,7 @@ public static class DefaultPermissions
     public const string CanCloseTopic = "CanCloseTopic";
     public const string CanOpenTopic = "CanOpenTopic";
     public const string CanDeleteTopic = "CanDeleteTopic";
+    public const string CanSearchForTopics = "CanSearchForTopics";
 
     public const string CanReadMessage = "CanReadMessage";
     public const string CanCreateMessage = "CanCreateMessage";
@@ -23,6 +25,7 @@ public static class DefaultPermissions
     public const string CanUpdateMessage = "CanUpdateMessage";
     public const string CanDeleteOwnMessage = "CanDeleteOwnMessage";
     public const string CanDeleteMessage = "CanDeleteMessage";
+    public const string CanSearchForMessages = "CanSearchForMessages";
 
     public const string CanGetUserInfo = "CanGetUserInfo";
     public const string CanSeeOwnMessages = "CanSeeOwnMessages";

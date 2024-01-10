@@ -19,6 +19,9 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanAddPermission,
         DefaultPermissions.CanUpdatePermission,
         DefaultPermissions.CanRemovePermission,
+        DefaultPermissions.CanSearchForForums,
+        DefaultPermissions.CanSearchForTopics,
+        DefaultPermissions.CanSearchForMessages,
     };
 
     public bool AdminHasAllPermissions => true;
@@ -46,7 +49,11 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanDeleteMessage,
 
         DefaultPermissions.CanSeeOwnMessages,
-        DefaultPermissions.CanSeeUserMessages
+        DefaultPermissions.CanSeeUserMessages,
+
+        DefaultPermissions.CanSearchForForums,
+        DefaultPermissions.CanSearchForTopics,
+        DefaultPermissions.CanSearchForMessages,
     };
 
     public List<string> UserDefaultPermissions => new()
@@ -57,13 +64,21 @@ public class PermissionConfiguration : IPermissionConfiguration
         DefaultPermissions.CanReadMessage,
         DefaultPermissions.CanCreateMessage,
         DefaultPermissions.CanUpdateOwnMessage,
-        DefaultPermissions.CanSeeOwnMessages
+        DefaultPermissions.CanSeeOwnMessages,
+
+        DefaultPermissions.CanSearchForForums,
+        DefaultPermissions.CanSearchForTopics,
+        DefaultPermissions.CanSearchForMessages,
     };
 
     public List<string> GuestDefaultPermissions => new()
     {
         DefaultPermissions.CanReadForum,
         DefaultPermissions.CanReadTopic,
-        DefaultPermissions.CanReadMessage
+        DefaultPermissions.CanReadMessage,
+
+        DefaultPermissions.CanSearchForForums,
+        DefaultPermissions.CanSearchForTopics,
+        DefaultPermissions.CanSearchForMessages,
     };
 }

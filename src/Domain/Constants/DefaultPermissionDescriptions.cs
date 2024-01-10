@@ -8,6 +8,7 @@ public static class DefaultPermissionDescriptions
     public const string CanCloseForum = "Can close a forum";
     public const string CanOpenForum = "Can open a forum";
     public const string CanDeleteForum = "Can delete a forum";
+    public const string CanSearchForForums = "Can search for forums";
 
     public const string CanReadTopic = "Can read a topic";
     public const string CanCreateTopic = "Can create a topic";
@@ -16,6 +17,7 @@ public static class DefaultPermissionDescriptions
     public const string CanCloseTopic = "Can close a topic";
     public const string CanOpenTopic = "Can open a topic";
     public const string CanDeleteTopic = "Can delete a topic";
+    public const string CanSearchForTopics = "Can search for topics";
 
     public const string CanReadMessage = "Can read messages";
     public const string CanCreateMessage = "Can create a message";
@@ -23,6 +25,7 @@ public static class DefaultPermissionDescriptions
     public const string CanUpdateMessage = "Can update not their messages";
     public const string CanDeleteOwnMessage = "Can delete their own messages";
     public const string CanDeleteMessage = "Can delete not their messages";
+    public const string CanSearchForMessages = "Can search for messages";
 
 
     public const string CanGetUserInfo = "Can get a user info";
