@@ -24,6 +24,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPermissionConfiguration, PermissionConfiguration>();
         services.AddScoped<IPermissionHelper, PermissionHelper>();
+        services.AddScoped(typeof(ISearchHelper<>), typeof(SearchHelper<>));
 
         return services;
     }
