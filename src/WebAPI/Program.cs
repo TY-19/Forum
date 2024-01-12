@@ -2,7 +2,7 @@ using Forum.Application;
 using Forum.Infrastructure;
 using Forum.Infrastructure.Data;
 using Forum.WebAPI;
-
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +11,8 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebServices(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 await app.InitialiseDatabaseAsync();
 

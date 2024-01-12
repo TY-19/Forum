@@ -13,7 +13,6 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-
         services.AddDbContext<ForumDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString);
@@ -23,18 +22,10 @@ public static class DependencyInjection
 
         services.AddScoped<ForumDbContextInitialiser>();
 
-        services
-            .AddIdentity<User, Role>(options =>
-            {
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЇЮЯ";
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireDigit = false;
-            })
+        services.AddIdentity<User, Role>()
             .AddEntityFrameworkStores<ForumDbContext>()
             .AddApiEndpoints();
+        services.ConfigureOptions<IdentityConfigureOptions>();
 
         services.AddScoped<IUserManager, ForumUserManager>();
         services.AddScoped<IRoleManager, ForumRoleManager>();
