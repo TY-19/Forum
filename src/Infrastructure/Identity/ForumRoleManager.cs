@@ -21,6 +21,7 @@ public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
         return await roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 

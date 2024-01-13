@@ -1,10 +1,12 @@
 ﻿using Forum.Application.Common.Models;
+using Forum.Application.Users.Dtos;
 
 namespace Forum.Application.Common.Interfaces;
 
 public interface IUserManager
 {
     IQueryable<IUser> GetAllUsers();
+    IQueryable<UserWithRoles> GetAllUsersWithRoles();
 
     Task<IEnumerable<IUser>> GetAllUsersAsync(CancellationToken cancellationToken);
     Task<IUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);

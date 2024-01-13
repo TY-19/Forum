@@ -1,17 +1,26 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
+using Forum.Application.Users.Dtos;
 using Forum.Infrastructure.Common.Extensions;
+using Forum.Infrastructure.Common.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Infrastructure.Identity;
 
-public class ForumUserManager(UserManager<User> userManager) : IUserManager
+public class ForumUserManager(UserManager<User> userManager,
+    IDatabaseHelper databaseHelper) : IUserManager
 {
     public IQueryable<IUser> GetAllUsers()
     {
         return userManager.Users.Include(u => u.UserProfile).AsNoTracking();
     }
+
+    public IQueryable<UserWithRoles> GetAllUsersWithRoles()
+    {
+        return databaseHelper.GetUsersWithRoles();
+    }
+
     public async Task<IEnumerable<IUser>> GetAllUsersAsync(CancellationToken cancellationToken)
     {
         return await userManager.Users
