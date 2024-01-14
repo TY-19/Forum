@@ -10,7 +10,7 @@ using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetAllUsers;
 using Forum.Application.Users.Queries.GetUser;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

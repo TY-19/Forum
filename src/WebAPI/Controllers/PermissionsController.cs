@@ -6,7 +6,7 @@ using Forum.Application.Permissions.Dtos;
 using Forum.Application.Permissions.Queries.GetAllPermissions;
 using Forum.Application.Permissions.Queries.GetPermission;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

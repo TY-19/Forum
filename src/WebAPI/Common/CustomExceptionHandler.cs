@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.WebAPI.Infrastructure;
+namespace Forum.WebAPI.Common;
 
 public class CustomExceptionHandler : IExceptionHandler
 {
@@ -21,13 +21,12 @@ public class CustomExceptionHandler : IExceptionHandler
         if (_exceptionHandlers.TryGetValue(exceptionType, out Func<HttpContext, Exception, Task>? value))
         {
             await value!.Invoke(httpContext, exception);
-            return true;
         }
         else
         {
             await HandleDefaultExceptionAsync(httpContext, exception);
-            return true;
         }
+        return true;
     }
 
     private async Task HandleValidationExceptionAsync(HttpContext httpContext, Exception exception)
@@ -53,7 +52,6 @@ public class CustomExceptionHandler : IExceptionHandler
             exception.Message,
             exception.StackTrace,
             InnerException = exception.InnerException?.Message
-
         });
     }
 }

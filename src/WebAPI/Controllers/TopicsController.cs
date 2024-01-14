@@ -9,7 +9,7 @@ using Forum.Application.Topics.Queries.GetTopic;
 using Forum.Application.UnreadElements.Commands.GetUnreadTopics;
 using Forum.Application.UnreadElements.Dtos;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

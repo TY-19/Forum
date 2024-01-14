@@ -6,13 +6,10 @@ public static class RequestParametersExtension
 {
     public static void SetPageOptions(this RequestParameters requestParameters, int defaultPageSize, int? maxPageSize)
     {
+        requestParameters.PageNumber ??= 1;
         requestParameters.PageSize ??= defaultPageSize;
         if (maxPageSize != null && requestParameters.PageSize > maxPageSize)
-        {
             requestParameters.PageSize = maxPageSize;
-        }
-
-        requestParameters.PageNumber ??= 1;
     }
 
     public static void SetPageOptions(this RequestParameters requestParameters, int defaultPageSize,

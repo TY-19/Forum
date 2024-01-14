@@ -13,12 +13,12 @@ public class SetUnreadStatusCommand : IRequest<ForumDto?>
 
 public class SetUnreadStatusCommandHandler(IForumDbContext context,
     IUserManager userManager,
-    ICurrentUserService currentUserService,
+    ICurrentUser currentUser,
     IMediator mediator) : IRequestHandler<SetUnreadStatusCommand, ForumDto?>
 {
     public async Task<ForumDto?> Handle(SetUnreadStatusCommand command, CancellationToken cancellationToken)
     {
-        var userName = currentUserService.GetCurrentUserName();
+        var userName = currentUser.GetCurrentUserName();
         if (userName == null || command.ForumDto == null)
             return command.ForumDto;
 

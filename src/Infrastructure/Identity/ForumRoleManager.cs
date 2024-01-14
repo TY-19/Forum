@@ -10,42 +10,34 @@ namespace Forum.Infrastructure.Identity;
 public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
 {
     public IQueryable<IRole> GetAllRoles()
-    {
-        return roleManager.Roles
+        => roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
             .AsNoTracking();
-    }
+
     public async Task<IEnumerable<IRole>> GetAllRolesAsync(CancellationToken cancellationToken)
-    {
-        return await roleManager.Roles
+        => await roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-    }
 
     public async Task<IRole?> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken)
-    {
-        return await roleManager.Roles
+        => await roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
             .FirstOrDefaultAsync(r => r.Id == roleId, cancellationToken);
-    }
     public async Task<IRole?> GetRoleByNameAsync(string roleName, CancellationToken cancellationToken)
-    {
-        return await roleManager.Roles
+        => await roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
             .FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
-    }
+
     public async Task<IRole?> GetRoleByApplicationRoleIdAsync(int applicationRoleId, CancellationToken cancellationToken)
-    {
-        return await roleManager.Roles
+        => await roleManager.Roles
             .Include(r => r.ApplicationRole)
             .ThenInclude(ar => ar.Permissions)
             .FirstOrDefaultAsync(r => r.ApplicationRole.Id == applicationRoleId, cancellationToken);
-    }
 
     public async Task<CustomResponse<IRole>> CreateRoleAsync(string roleName, CancellationToken cancellationToken)
     {
@@ -80,9 +72,7 @@ public class ForumRoleManager(RoleManager<Role> roleManager) : IRoleManager
         return GetCustomResponse(result);
     }
     private static CustomResponse GetCustomResponse(IdentityResult result)
-    {
-        return result.Succeeded
+        => result.Succeeded
             ? new CustomResponse() { Succeeded = true }
             : new CustomResponse() { Succeeded = false, Message = result.Errors.ToErrorString() };
-    }
 }

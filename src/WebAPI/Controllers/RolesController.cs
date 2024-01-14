@@ -6,7 +6,7 @@ using Forum.Application.Roles.Commands.UpdateRolePermissions;
 using Forum.Application.Roles.Dtos;
 using Forum.Application.Roles.Queries.GetAllRoles;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

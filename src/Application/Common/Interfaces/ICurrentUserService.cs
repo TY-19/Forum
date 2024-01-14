@@ -1,6 +1,6 @@
 ﻿namespace Forum.Application.Common.Interfaces;
 
-public interface ICurrentUserService
+public interface ICurrentUser
 {
     string? GetCurrentUserName();
 }

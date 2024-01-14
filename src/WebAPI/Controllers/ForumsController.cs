@@ -4,7 +4,7 @@ using Forum.Application.Forums.Commands.UpdateForum;
 using Forum.Application.Forums.Dtos;
 using Forum.Application.Forums.Queries.GetForum;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

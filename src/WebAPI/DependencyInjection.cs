@@ -1,8 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
+using Forum.WebAPI.Common;
+using Forum.WebAPI.Common.Authorization;
 using Forum.WebAPI.Configurations;
-using Forum.WebAPI.Configurations.Authorization;
-using Forum.WebAPI.Infrastructure;
-using Forum.WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
@@ -38,7 +37,7 @@ public static class DependencyInjection
         services.AddTransient<IAuthorizationHandler, PermissionHandler>();
         services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }

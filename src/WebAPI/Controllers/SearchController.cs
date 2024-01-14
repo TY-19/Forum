@@ -6,7 +6,7 @@ using Forum.Application.Search.Queries.SearchMessages;
 using Forum.Application.Search.Queries.SearchTopics;
 using Forum.Application.Topics.Dtos;
 using Forum.Domain.Constants;
-using Forum.WebAPI.Configurations.Authorization;
+using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,13 +28,7 @@ public class SearchController(IMediator mediator) : ControllerBase
         var request = new SearchForumsRequest()
         {
             SearchedPhrase = search ?? "",
-            SearchParameters = new SearchParameters
-            {
-                SearchExact = exact ?? false,
-                SearchAllWords = allWords ?? false,
-                PageSize = pageSize,
-                SkipNumberElements = startAfterElement,
-            }
+            SearchParameters = GetSearchParameters(exact, allWords, pageSize, startAfterElement)
         };
         return Ok(await mediator.Send(request, cancellationToken));
     }
@@ -51,13 +45,7 @@ public class SearchController(IMediator mediator) : ControllerBase
         var request = new SearchTopicsRequest()
         {
             SearchedPhrase = search ?? "",
-            SearchParameters = new SearchParameters
-            {
-                SearchExact = exact ?? false,
-                SearchAllWords = allWords ?? false,
-                PageSize = pageSize,
-                SkipNumberElements = startAfterElement,
-            }
+            SearchParameters = GetSearchParameters(exact, allWords, pageSize, startAfterElement)
         };
         return Ok(await mediator.Send(request, cancellationToken));
     }
@@ -75,14 +63,19 @@ public class SearchController(IMediator mediator) : ControllerBase
         {
             SearchedPhrase = search ?? "",
             UserName = user,
-            SearchParameters = new SearchParameters
-            {
-                SearchExact = exact ?? false,
-                SearchAllWords = allWords ?? false,
-                PageSize = pageSize,
-                SkipNumberElements = startAfterElement,
-            }
+            SearchParameters = GetSearchParameters(exact, allWords, pageSize, startAfterElement)
         };
         return Ok(await mediator.Send(request, cancellationToken));
+    }
+
+    private static SearchParameters GetSearchParameters(bool? exact, bool? allWords, int? pageSize, int? startAfterElement)
+    {
+        return new SearchParameters
+        {
+            SearchExact = exact ?? false,
+            SearchAllWords = allWords ?? false,
+            PageSize = pageSize,
+            SkipNumberElements = startAfterElement,
+        };
     }
 }

@@ -13,14 +13,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        string? enableSensitiveDataLogging = configuration?["EnableSensitiveDataLogging"];
-        services.AddDbContext<ForumDbContext>((sp, options) =>
-        {
-            options.UseSqlServer(connectionString);
-            if (enableSensitiveDataLogging == "true" || enableSensitiveDataLogging == "1")
-                options.EnableSensitiveDataLogging();
-        });
+        ConfigureDbContext(services, configuration);
 
         services.AddScoped<IForumDbContext>(provider => provider.GetRequiredService<ForumDbContext>());
 
@@ -38,5 +31,17 @@ public static class DependencyInjection
         services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 
         return services;
+    }
+
+    private static void ConfigureDbContext(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        string? enableSensitiveDataLogging = configuration?["EnableSensitiveDataLogging"];
+        services.AddDbContext<ForumDbContext>((sp, options) =>
+        {
+            options.UseSqlServer(connectionString);
+            if (enableSensitiveDataLogging == "true" || enableSensitiveDataLogging == "1")
+                options.EnableSensitiveDataLogging();
+        });
     }
 }

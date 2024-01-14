@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace Forum.WebAPI.Configurations.Authorization;
+namespace Forum.WebAPI.Common.Authorization;
 
 public class PermissionRequirement(string? permissionType) : IAuthorizationRequirement
 {

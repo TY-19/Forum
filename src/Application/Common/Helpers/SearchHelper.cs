@@ -59,26 +59,27 @@ public class SearchHelper<T> : ISearchHelper<T>
 
     private void SetSearchFunction(bool? exact, bool? allWords, Func<string, bool>? custom)
     {
-        if (custom != null)
-        {
-            searchFunction = custom;
-        }
-        else if (exact == true)
-        {
-            const string pattern = @"\s*(?:<[^<>]+>\s*)*";
-            string lookFor = string.Join(pattern, searchWords);
-            var regex = new Regex(lookFor, RegexOptions.IgnoreCase);
-            searchFunction = regex.IsMatch;
-        }
-        else if (allWords == true)
-        {
-            searchFunction = (text) => Array.TrueForAll(searchWords, word => text.Contains(word, StringComparison.InvariantCultureIgnoreCase));
-        }
-        else
-        {
-            searchFunction = (text) => Array.Exists(searchWords, word => text.Contains(word, StringComparison.InvariantCultureIgnoreCase));
-        }
+        if (custom != null) searchFunction = custom;
+        else if (exact == true) searchFunction = SearchExactSubstring;
+        else if (allWords == true) searchFunction = SearchAllWords;
+        else searchFunction = SearchAnyWord;
     }
+
+    private bool SearchExactSubstring(string text)
+    {
+        const string pattern = @"\s*(?:<[^<>]+>\s*)*";
+        string lookFor = string.Join(pattern, searchWords);
+        var regex = new Regex(lookFor, RegexOptions.IgnoreCase);
+        return regex.IsMatch(text);
+    }
+
+    private bool SearchAllWords(string text)
+        => Array.TrueForAll(searchWords,
+            word => text.Contains(word, StringComparison.InvariantCultureIgnoreCase));
+
+    private bool SearchAnyWord(string text)
+        => Array.Exists(searchWords,
+            word => text.Contains(word, StringComparison.InvariantCultureIgnoreCase));
 
     private async Task<List<T>> FilterAsync(IQueryable<T> collection, CancellationToken cancellationToken)
     {
@@ -97,42 +98,41 @@ public class SearchHelper<T> : ISearchHelper<T>
                 break;
             }
 
-            foreach (var toCheck in toChecks)
-            {
-                skipNumberElements++;
-
-                if (!IsInSearch(toCheck))
-                    continue;
-
-                found.Add(toCheck);
-
-                if (found.Count == pageSize)
-                    break;
-            }
+            CheckElements(toChecks, found);
         }
         return found;
+    }
+
+    private void CheckElements(List<T> toChecks, List<T> found)
+    {
+        foreach (var toCheck in toChecks)
+        {
+            skipNumberElements++;
+
+            if (!IsInSearch(toCheck))
+                continue;
+
+            found.Add(toCheck);
+
+            if (found.Count == pageSize)
+                break;
+        }
     }
 
     private bool IsInSearch(T toCheck)
     {
         if (findByOneField != null)
-        {
             return searchFunction(findByOneField(toCheck));
-        }
         else if (findByMultipleFields != null)
-        {
             return findByMultipleFields(toCheck).Any(x => searchFunction(x));
-        }
         else return false;
     }
 
     private SearchResult<T> GetSearchResult(List<T> found)
-    {
-        return new SearchResult<T>()
+        => new()
         {
             Elements = found,
             HasNextPage = hasNextPage,
             SkipElementsForNextPage = hasNextPage ? skipNumberElements : null
         };
-    }
 }

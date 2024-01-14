@@ -19,7 +19,7 @@ public class GetTopicRequest : IRequest<TopicDto?>
 
 public class GetTopicRequestHandler(IForumDbContext context,
     IUserManager userManager,
-    ICurrentUserService currentUserService,
+    ICurrentUser currentUser,
     IMediator mediator) : IRequestHandler<GetTopicRequest, TopicDto?>
 {
     public async Task<TopicDto?> Handle(GetTopicRequest request, CancellationToken cancellationToken)
@@ -87,7 +87,7 @@ public class GetTopicRequestHandler(IForumDbContext context,
 
     private async Task MarkReturningMessagesAsReadAsync(TopicDto topicDto, CancellationToken cancellationToken)
     {
-        string? userName = currentUserService.GetCurrentUserName();
+        string? userName = currentUser.GetCurrentUserName();
         if (userName == null)
             return;
 

@@ -10,15 +10,12 @@ namespace Forum.Infrastructure.Identity;
 public class JwtHandler(IConfiguration configuration, IUserManager userManager) : IJwtHandler
 {
     public async Task<JwtSecurityToken> GetTokenAsync(IUser user)
-    {
-        return new JwtSecurityToken(
+        => new JwtSecurityToken(
             issuer: configuration?["JwtSettings:Issuer"] ?? "Forum",
             audience: configuration?["JwtSettings:Audience"] ?? "*",
             claims: await GetClaimsAsync(user),
             expires: GetExpirationTime(),
-            signingCredentials: GetSigningCredentials()
-            );
-    }
+            signingCredentials: GetSigningCredentials());
 
     private async Task<IEnumerable<Claim>> GetClaimsAsync(IUser user)
     {

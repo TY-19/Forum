@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
-namespace Forum.WebAPI.Configurations.Authorization;
+namespace Forum.WebAPI.Configurations;
 
 public class AuthorizationConfigureOptions : IConfigureOptions<AuthorizationOptions>
 {
