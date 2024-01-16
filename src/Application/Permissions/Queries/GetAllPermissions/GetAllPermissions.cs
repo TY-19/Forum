@@ -69,14 +69,12 @@ public class GetAllPermissionsRequestHandler(IForumDbContext context,
     }
 
     private static IQueryable<Permission> OrderPermissions(IQueryable<Permission> permissions, RequestParameters requestParameters)
-    {
-        return requestParameters.OrderAscending switch
+        => requestParameters.OrderAscending switch
         {
             true => permissions.OrderBy(p => p.Name),
             false => permissions.OrderByDescending(p => p.Name),
             _ => permissions
         };
-    }
 
     private List<string> GetRoleNames(Permission permission, IEnumerable<IRole> allRoles)
     {

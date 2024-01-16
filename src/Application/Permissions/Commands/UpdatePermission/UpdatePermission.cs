@@ -4,6 +4,7 @@ using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Permissions.Commands.UpdatePermission;
 
@@ -16,7 +17,8 @@ public class UpdatePermissionCommand : IRequest<CustomResponse>
 }
 
 public class UpdatePermissionCommandHandler(IForumDbContext context,
-    IRoleManager roleManager) : IRequestHandler<UpdatePermissionCommand, CustomResponse>
+    IRoleManager roleManager,
+    ILogger<UpdatePermissionCommandHandler> logger) : IRequestHandler<UpdatePermissionCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdatePermissionCommand command, CancellationToken cancellationToken)
     {
@@ -44,6 +46,7 @@ public class UpdatePermissionCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the permission.");
             return new CustomResponse(ex);
         }
     }

@@ -5,7 +5,7 @@ using Forum.Application.Roles.Commands.UpdateRole;
 using Forum.Application.Roles.Commands.UpdateRolePermissions;
 using Forum.Application.Roles.Dtos;
 using Forum.Application.Roles.Queries.GetAllRoles;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +16,7 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class RolesController(IMediator mediator) : ControllerBase
 {
-    [PermissionAuthorize(DefaultPermissions.CanGetAllRoles)]
+    [PermissionAuthorize(PermissionType.CanGetAllRoles)]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -35,7 +35,7 @@ public class RolesController(IMediator mediator) : ControllerBase
         }, cancellationToken));
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanCreateRole)]
+    [PermissionAuthorize(PermissionType.CanCreateRole)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -47,7 +47,7 @@ public class RolesController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanUpdateRole)]
+    [PermissionAuthorize(PermissionType.CanUpdateRole)]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -59,7 +59,7 @@ public class RolesController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanAddPermission)]
+    [PermissionAuthorize(PermissionType.CanAddPermission)]
     [Route("permissions")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -72,7 +72,7 @@ public class RolesController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanDeleteRole)]
+    [PermissionAuthorize(PermissionType.CanDeleteRole)]
     [Route("{roleName}")]
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

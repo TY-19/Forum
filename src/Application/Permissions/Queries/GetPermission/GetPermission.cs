@@ -16,14 +16,16 @@ public class GetPermissionRequestHandler(IForumDbContext context,
     public async Task<PermissionGetDto?> Handle(GetPermissionRequest request, CancellationToken cancellationToken)
     {
         var permission = await context.Permissions
+            .Include(p => p.Roles)
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
         if (permission == null)
             return null;
 
-        List<string> rolesNames = await roleManager.GetAllRoles()
+        var roles = await roleManager.GetAllRoles().ToListAsync();
+        List<string> rolesNames = roles
             .Where(r => permission.Roles.Any(pr => pr.IdentityRoleId == r.Id) && r.Name != null)
             .Select(r => r.Name!)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return new PermissionGetDto(permission, rolesNames);
     }

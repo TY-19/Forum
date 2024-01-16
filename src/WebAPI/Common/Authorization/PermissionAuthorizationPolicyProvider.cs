@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Forum.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace Forum.WebAPI.Common.Authorization;
@@ -12,11 +13,11 @@ public class PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions
         if (!policyName.StartsWith(PolicyPrefix, StringComparison.OrdinalIgnoreCase))
             return await base.GetPolicyAsync(policyName);
 
-        string permission = policyName[PolicyPrefix.Length..];
-
-        var requirement = new PermissionRequirement(permission);
+        if (!Enum.TryParse(policyName[PolicyPrefix.Length..], out PermissionType type))
+            return await base.GetPolicyAsync(policyName);
 
         return new AuthorizationPolicyBuilder()
-            .AddRequirements(requirement).Build();
+            .AddRequirements(new PermissionRequirement(type))
+            .Build();
     }
 }

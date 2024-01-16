@@ -4,6 +4,7 @@ using Forum.Application.Users.Dtos;
 using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.CreateUser;
 
@@ -15,7 +16,8 @@ public class CreateUserCommand : IRequest<CustomResponse<UserDto>>
 }
 
 public class CreateUserCommandHandler(IUserManager userManager,
-    IForumDbContext context) : IRequestHandler<CreateUserCommand, CustomResponse<UserDto>>
+    IForumDbContext context,
+    ILogger<CreateUserCommandHandler> logger) : IRequestHandler<CreateUserCommand, CustomResponse<UserDto>>
 {
     public async Task<CustomResponse<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
@@ -37,6 +39,7 @@ public class CreateUserCommandHandler(IUserManager userManager,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the user.");
             return new CustomResponse<UserDto>(ex);
         }
 
@@ -53,8 +56,7 @@ public class CreateUserCommandHandler(IUserManager userManager,
     }
 
     private async Task<UserDto> GetUserDto(IUser user, CancellationToken cancellationToken)
-    {
-        return new UserDto()
+        => new UserDto()
         {
             Id = user.Id,
             UserName = user.UserName,
@@ -62,5 +64,4 @@ public class CreateUserCommandHandler(IUserManager userManager,
             UserProfileId = user.UserProfile.Id,
             Roles = await userManager.GetRolesAsync(user, cancellationToken),
         };
-    }
 }

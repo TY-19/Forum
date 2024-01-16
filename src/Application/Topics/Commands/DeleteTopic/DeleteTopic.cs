@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Application.Forums.Queries.CheckIfForumIsOpen;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Topics.Commands.DeleteTopic;
 
@@ -13,7 +14,8 @@ public class DeleteTopicCommand : IRequest<CustomResponse>
 }
 
 public class DeleteTopicCommandHandler(IForumDbContext context,
-    IMediator mediator) : IRequestHandler<DeleteTopicCommand, CustomResponse>
+    IMediator mediator,
+    ILogger<DeleteTopicCommandHandler> logger) : IRequestHandler<DeleteTopicCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(DeleteTopicCommand command, CancellationToken cancellationToken)
     {
@@ -28,12 +30,12 @@ public class DeleteTopicCommandHandler(IForumDbContext context,
         {
             context.Topics.Remove(topic);
             await context.SaveChangesAsync(cancellationToken);
+            return new CustomResponse() { Succeeded = true };
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while deleting the topic.");
             return new CustomResponse(ex);
         }
-
-        return new CustomResponse() { Succeeded = true };
     }
 }

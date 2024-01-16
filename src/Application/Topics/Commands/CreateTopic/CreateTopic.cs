@@ -4,17 +4,19 @@ using Forum.Application.Forums.Queries.CheckIfForumIsOpen;
 using Forum.Application.Topics.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Topics.Commands.CreateTopic;
 
 public class CreateTopicCommand : IRequest<CustomResponse<TopicDto>>
 {
     public string Title { get; set; } = string.Empty;
-    public int? ParentForumId { get; set; }
+    public int ParentForumId { get; set; }
 }
 
 public class CreateTopicCommandHandler(IForumDbContext context,
-    IMediator mediator) : IRequestHandler<CreateTopicCommand, CustomResponse<TopicDto>>
+    IMediator mediator,
+    ILogger<CreateTopicCommandHandler> logger) : IRequestHandler<CreateTopicCommand, CustomResponse<TopicDto>>
 {
     public async Task<CustomResponse<TopicDto>> Handle(CreateTopicCommand command, CancellationToken cancellationToken)
     {
@@ -30,6 +32,7 @@ public class CreateTopicCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the topic.");
             return new CustomResponse<TopicDto>(ex);
         }
 

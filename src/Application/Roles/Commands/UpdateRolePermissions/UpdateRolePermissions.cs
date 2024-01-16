@@ -6,6 +6,7 @@ using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Text;
 
@@ -20,7 +21,8 @@ public class UpdateRolePermissionsCommand : IRequest<CustomResponse>
 
 public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
     IRoleManager roleManager,
-    IMediator mediator) : IRequestHandler<UpdateRolePermissionsCommand, CustomResponse>
+    IMediator mediator,
+    ILogger<UpdateRolePermissionsCommandHandler> logger) : IRequestHandler<UpdateRolePermissionsCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateRolePermissionsCommand command, CancellationToken cancellationToken)
     {
@@ -49,6 +51,7 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the role permissions.");
             return new CustomResponse(ex);
         }
 
@@ -60,7 +63,6 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
                 return new CustomResponse() { Succeeded = false, Message = response.Message };
             }
         }
-
 
         return new CustomResponse() { Succeeded = true };
     }
@@ -100,7 +102,6 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
             {
                 rolePermissions.Add(toAdd);
             }
-
         }
     }
 
@@ -134,13 +135,10 @@ public class UpdateRolePermissionsCommandHandler(IForumDbContext context,
     }
 
     private static bool AreEqual(Permission permission, PermissionPostDto dto)
-    {
-        return permission != null && dto != null && permission.Name == dto.Name
+        => permission != null && dto != null && permission.Type == dto.Type
             && permission.IsGlobal == dto.IsGlobal && permission.ForumId == dto.ForumId;
-    }
+
     private static bool AreEqual(Permission permissionOne, Permission permissionTwo)
-    {
-        return permissionOne != null && permissionTwo != null && permissionOne.Name == permissionTwo.Name
+        => permissionOne != null && permissionTwo != null && permissionOne.Type == permissionTwo.Type
             && permissionOne.IsGlobal == permissionTwo.IsGlobal && permissionOne.ForumId == permissionTwo.ForumId;
-    }
 }

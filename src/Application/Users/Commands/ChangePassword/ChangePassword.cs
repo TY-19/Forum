@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.ChangePassword;
 
@@ -11,7 +12,8 @@ public class ChangePasswordCommand : IRequest<CustomResponse>
     public string NewPassword { get; set; } = null!;
 }
 
-public class ChangePasswordCommandHandler(IUserManager userManager) : IRequestHandler<ChangePasswordCommand, CustomResponse>
+public class ChangePasswordCommandHandler(IUserManager userManager,
+    ILogger<ChangePasswordCommandHandler> logger) : IRequestHandler<ChangePasswordCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(ChangePasswordCommand command, CancellationToken cancellationToken)
     {
@@ -25,6 +27,7 @@ public class ChangePasswordCommandHandler(IUserManager userManager) : IRequestHa
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while changing the password.");
             return new CustomResponse(ex);
         }
     }

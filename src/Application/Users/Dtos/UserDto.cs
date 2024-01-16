@@ -11,9 +11,7 @@ public class UserDto
     public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
 
     public UserDto()
-    {
-
-    }
+    { }
     public UserDto(IUser? user)
     {
         if (user != null)

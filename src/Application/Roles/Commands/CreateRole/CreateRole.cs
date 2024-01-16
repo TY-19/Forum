@@ -2,6 +2,7 @@
 using Forum.Application.Common.Models;
 using Forum.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Roles.Commands.CreateRole;
 
@@ -11,7 +12,8 @@ public class CreateRoleCommand : IRequest<CustomResponse>
 }
 
 public class CreateRoleCommandHandler(IForumDbContext context,
-    IRoleManager roleManager) : IRequestHandler<CreateRoleCommand, CustomResponse>
+    IRoleManager roleManager,
+    ILogger<CreateRoleCommandHandler> logger) : IRequestHandler<CreateRoleCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
@@ -25,6 +27,7 @@ public class CreateRoleCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the role.");
             return new CustomResponse(ex);
         }
     }

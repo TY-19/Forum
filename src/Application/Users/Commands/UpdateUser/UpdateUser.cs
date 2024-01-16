@@ -1,18 +1,20 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.UpdateUser;
 
 public class UpdateUserCommand : IRequest<CustomResponse>
 {
-    public string? UserId { get; set; }
+    public string UserId { get; set; } = null!;
     public string? UserName { get; set; }
     public string? UpdatedName { get; set; }
     public string? UpdatedEmail { get; set; }
 }
 
-public class UpdateUserCommandHandler(IUserManager userManager) : IRequestHandler<UpdateUserCommand, CustomResponse>
+public class UpdateUserCommandHandler(IUserManager userManager,
+    ILogger<UpdateUserCommandHandler> logger) : IRequestHandler<UpdateUserCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateUserCommand command, CancellationToken cancellationToken)
     {
@@ -32,6 +34,7 @@ public class UpdateUserCommandHandler(IUserManager userManager) : IRequestHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the user.");
             return new CustomResponse(ex);
         }
     }

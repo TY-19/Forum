@@ -34,23 +34,19 @@ public class GetForumRequestHandler(IForumDbContext context,
     }
 
     private async Task<IEnumerable<SubforumDto>> GetSubforumsAsync(int? parentForumId, CancellationToken cancellationToken)
-    {
-        return await context.Forums
+        => await context.Forums
             .Where(f => f.ParentForumId == parentForumId)
             .Include(f => f.Subforums)
             .Include(f => f.Topics)
             .Select(f => new SubforumDto(f))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-    }
 
     private async Task<ForumDto?> GetForumDtoAsync(int id, CancellationToken cancellationToken)
-    {
-        return await context.Forums
+        => await context.Forums
             .Where(f => f.Id == id)
             .Include(f => f.Subforums)
             .Include(f => f.Topics)
             .Select(f => new ForumDto(f))
             .FirstOrDefaultAsync(cancellationToken);
-    }
 }

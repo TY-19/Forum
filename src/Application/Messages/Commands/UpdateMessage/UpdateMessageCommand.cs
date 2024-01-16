@@ -2,9 +2,10 @@
 using Forum.Application.Common.Models;
 using Forum.Application.Permissions.Queries.CheckUserPermission;
 using Forum.Application.Topics.Queries.CheckIfTopicIsOpen;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Messages.Commands.UpdateMessage;
 
@@ -17,8 +18,10 @@ public class UpdateMessageCommand : IRequest<CustomResponse>
     public string Text { get; set; } = string.Empty;
 }
 
-public class UpdateMessageCommandHandler(IForumDbContext context, IUserManager userManager,
-    IMediator mediator) : IRequestHandler<UpdateMessageCommand, CustomResponse>
+public class UpdateMessageCommandHandler(IForumDbContext context,
+    IUserManager userManager,
+    IMediator mediator,
+    ILogger<UpdateMessageCommandHandler> logger) : IRequestHandler<UpdateMessageCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateMessageCommand command, CancellationToken cancellationToken)
     {
@@ -57,6 +60,7 @@ public class UpdateMessageCommandHandler(IForumDbContext context, IUserManager u
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the message.");
             return new CustomResponse(ex);
         }
     }
@@ -66,7 +70,7 @@ public class UpdateMessageCommandHandler(IForumDbContext context, IUserManager u
         var command = new CheckUserPermissionRequest()
         {
             ForumId = forumId,
-            PermissionName = DefaultPermissions.CanUpdateMessage,
+            PermType = PermissionType.CanUpdateMessage,
             UserId = userId
         };
         return (await mediator.Send(command, cancellationToken)).Succeeded;

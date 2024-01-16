@@ -1,8 +1,8 @@
-﻿using Forum.Application.Common.Interfaces;
-using Forum.Application.Common.Models;
-using Forum.Application.Roles.Commands.CreateRole;
+﻿using Forum.Application.Roles.Commands.CreateRole;
+using Forum.Domain.Common;
 using Forum.Domain.Constants;
 using Forum.Domain.Entities;
+using Forum.Domain.Enums;
 using Forum.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -18,8 +18,7 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
     IMediator mediator,
     ForumDbContext context,
     UserManager<User> userManager,
-    RoleManager<Role> roleManager,
-    IPermissionHelper permissionHelper)
+    RoleManager<Role> roleManager)
 {
     private readonly Dictionary<string, bool> flags = new()
     {
@@ -88,13 +87,14 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         if (context.Permissions.Any() && !flags["SeedDefault"])
             return;
 
-        foreach (var permissionType in permissionHelper.DefaultPermissionTypes
-            .Where(perm => context.Permissions.All(p => p.Name != perm!.Name)))
+        foreach (var defaultPermission in DefaultPermissionTypes.GetDefaultPermissions()
+            .Where(perm => context.Permissions.All(p => p.Type != perm.Type)))
         {
             var permission = new Permission()
             {
-                Name = permissionType!.Name,
-                Description = permissionType.Description,
+                Type = defaultPermission.Type,
+                Name = defaultPermission.Name,
+                Description = defaultPermission.Description,
                 IsGlobal = true,
             };
             await context.Permissions.AddAsync(permission);
@@ -107,10 +107,10 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
         if (!flags["SeedDefault"])
             return;
 
-        await SetDefaultPermissionsForRole(DefaultRoles.ADMIN, permissionHelper.GetAdminDefaultPermissions());
-        await SetDefaultPermissionsForRole(DefaultRoles.MODERATOR, permissionHelper.GetModeratorDefaultPermissions());
-        await SetDefaultPermissionsForRole(DefaultRoles.USER, permissionHelper.GetUserDefaultPermissions());
-        await SetDefaultPermissionsForRole(DefaultRoles.GUEST, permissionHelper.GetGuestDefaultPermissions());
+        await SetDefaultPermissionsForRole(DefaultRoles.ADMIN, PermissionsConfiguration.AdminDefaultPermissions);
+        await SetDefaultPermissionsForRole(DefaultRoles.MODERATOR, PermissionsConfiguration.ModeratorDefaultPermissions);
+        await SetDefaultPermissionsForRole(DefaultRoles.USER, PermissionsConfiguration.UserDefaultPermissions);
+        await SetDefaultPermissionsForRole(DefaultRoles.GUEST, PermissionsConfiguration.GuestDefaultPermissions);
     }
 
     private async Task SetDefaultPermissionsForRole(string roleName, IEnumerable<PermissionType> rolePermissions)
@@ -121,7 +121,7 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
             return;
 
         var permissions = await context.Permissions.Include(p => p.Roles)
-            .Where(p => rolePermissions.Select(rp => rp.Name).Contains(p.Name))
+            .Where(p => rolePermissions.Contains(p.Type))
             .ToListAsync();
 
         foreach (var permission in permissions)

@@ -1,14 +1,18 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using Forum.Application.Permissions.Dtos;
+using Forum.Domain.Common;
 using Forum.Domain.Entities;
+using Forum.Domain.Enums;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace Forum.Application.Permissions.Commands.CreatePermission;
 
 public class CreatePermissionCommand : IRequest<CustomResponse<PermissionGetDto>>
 {
+    public PermissionType Type { get; set; }
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public bool IsGlobal { get; set; }
@@ -18,27 +22,25 @@ public class CreatePermissionCommand : IRequest<CustomResponse<PermissionGetDto>
 
 public class CreatePermissionCommandHandler(IForumDbContext context,
     IRoleManager roleManager,
-    IPermissionHelper helper) : IRequestHandler<CreatePermissionCommand, CustomResponse<PermissionGetDto>>
+    ILogger<CreatePermissionCommandHandler> logger) : IRequestHandler<CreatePermissionCommand, CustomResponse<PermissionGetDto>>
 {
     public async Task<CustomResponse<PermissionGetDto>> Handle(CreatePermissionCommand command, CancellationToken cancellationToken)
     {
-        if (!helper.DefaultPermissionTypes.Select(dpt => dpt.Name).Contains(command.Name))
+        var permission = DefaultPermissionTypes.GetDefaultPermissions()
+            .Find(p => p.Type == command.Type);
+        if (permission == null)
             return new CustomResponse<PermissionGetDto>()
             {
                 Succeeded = false,
                 Message = $"The application hasn't been configured to use {command.Name} permission"
             };
 
-        if (!command.IsGlobal && helper.CanBeOnlyGlobal(command.Name))
+        if (!command.IsGlobal && PermissionsConfiguration.AlwaysHaveGlobalScope.Any(pt => pt == command.Type))
             return new CustomResponse<PermissionGetDto>()
             {
                 Succeeded = false,
                 Message = $"{command.Name} permission must be used globally and can't be restricted only to {command.ForumId}"
             };
-
-        string description = string.IsNullOrEmpty(command.Description)
-            ? helper.DefaultPermissionTypes.Find(dpt => dpt.Name == command.Name)?.Description ?? ""
-            : command.Description;
 
         List<IRole> roles = [];
         foreach (var roleName in command.Roles)
@@ -48,15 +50,8 @@ public class CreatePermissionCommandHandler(IForumDbContext context,
                 roles.Add(role);
         }
 
+        SetPermissionParameters(permission, command, roles.Select(x => x.ApplicationRole).ToList());
 
-        var permission = new Permission()
-        {
-            Name = command.Name,
-            Description = description,
-            IsGlobal = command.IsGlobal,
-            ForumId = command.ForumId,
-            Roles = roles.Select(x => x.ApplicationRole).ToList()
-        };
         try
         {
             await context.Permissions.AddAsync(permission, cancellationToken);
@@ -64,9 +59,28 @@ public class CreatePermissionCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the permission.");
             return new CustomResponse<PermissionGetDto>(ex);
         }
         var roleNames = roles.Where(r => r != null && r.Name != null).Select(r => r.Name!);
-        return new CustomResponse<PermissionGetDto>() { Succeeded = true, Payload = new PermissionGetDto(permission, roleNames) };
+        return new CustomResponse<PermissionGetDto>()
+        {
+            Succeeded = true,
+            Payload = new PermissionGetDto(permission, roleNames)
+        };
+    }
+
+    private static void SetPermissionParameters(Permission permission,
+        CreatePermissionCommand command, IEnumerable<ApplicationRole> roles)
+    {
+        if (!string.IsNullOrEmpty(command.Name))
+            permission.Name = command.Name;
+
+        if (!string.IsNullOrEmpty(command.Description))
+            permission.Description = command.Description;
+
+        permission.IsGlobal = command.IsGlobal;
+        permission.ForumId = command.ForumId;
+        permission.Roles = roles;
     }
 }

@@ -4,6 +4,7 @@ using Forum.Domain.Constants;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Permissions.Commands.DeletePermission;
 
@@ -13,7 +14,8 @@ public class DeletePermissionCommand : IRequest<CustomResponse>
 }
 
 public class DeletePermissionCommandHandler(IForumDbContext context,
-    IRoleManager roleManager) : IRequestHandler<DeletePermissionCommand, CustomResponse>
+    IRoleManager roleManager,
+    ILogger<DeletePermissionCommandHandler> logger) : IRequestHandler<DeletePermissionCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(DeletePermissionCommand command, CancellationToken cancellationToken)
     {
@@ -33,6 +35,7 @@ public class DeletePermissionCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while deleting the permission.");
             return new CustomResponse(ex);
         }
     }

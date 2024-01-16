@@ -16,9 +16,7 @@ public class ForumDto
     public IEnumerable<TopicForumDto> Topics { get; set; } = new List<TopicForumDto>();
 
     public ForumDto()
-    {
-
-    }
+    { }
 
     public ForumDto(ForumEntity forum)
     {

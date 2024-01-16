@@ -1,4 +1,5 @@
 ﻿using Forum.Application.Permissions.Queries.CheckUserPermission;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 
@@ -11,18 +12,12 @@ public class PermissionHandler(IHttpContextAccessor httpContextAccessor,
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-        if (requirement.PermissionType == null)
-        {
-            context.Succeed(requirement);
-            logger.LogInformation("No permission was required");
-        }
-
         int? requestedForumId = GetForumIdFromRoute();
         string? userName = context.User.Identity?.Name;
 
         var response = await mediator.Send(new CheckUserPermissionRequest()
         {
-            PermissionName = requirement.PermissionType!,
+            PermType = requirement.PermissionType,
             UserName = userName,
             ForumId = requestedForumId
         });
@@ -42,7 +37,7 @@ public class PermissionHandler(IHttpContextAccessor httpContextAccessor,
         return int.TryParse(forumIdObj?.ToString(), out int forumId) ? forumId : null;
     }
 
-    private void LogResult(bool isGranted, string? permissionType, int? forumId)
+    private void LogResult(bool isGranted, PermissionType permissionType, int? forumId)
     {
         switch (isGranted, forumId)
         {

@@ -2,6 +2,7 @@
 using Forum.Application.Common.Models;
 using Forum.Domain.Constants;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Roles.Commands.UpdateRole;
 
@@ -11,7 +12,8 @@ public class UpdateRoleCommand : IRequest<CustomResponse>
     public string NewName { get; set; } = null!;
 }
 
-public class UpdateRoleCommandHandler(IRoleManager roleManager) : IRequestHandler<UpdateRoleCommand, CustomResponse>
+public class UpdateRoleCommandHandler(IRoleManager roleManager,
+    ILogger<UpdateRoleCommandHandler> logger) : IRequestHandler<UpdateRoleCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateRoleCommand command, CancellationToken cancellationToken)
     {
@@ -24,6 +26,7 @@ public class UpdateRoleCommandHandler(IRoleManager roleManager) : IRequestHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the role.");
             return new CustomResponse(ex);
         }
     }

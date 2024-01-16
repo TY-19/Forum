@@ -3,7 +3,7 @@ using Forum.Application.Messages.Commands.DeleteMessage;
 using Forum.Application.Messages.Commands.UpdateMessage;
 using Forum.Application.Messages.Dtos;
 using Forum.Application.Messages.Queries.GetMessage;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class MessagesController(IMediator mediator) : ControllerBase
 {
-    [PermissionAuthorize(DefaultPermissions.CanReadMessage)]
+    [PermissionAuthorize(PermissionType.CanReadMessage)]
     [Route("{messageId}")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -27,7 +27,7 @@ public class MessagesController(IMediator mediator) : ControllerBase
         return message == null ? NotFound() : Ok(message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanCreateMessage)]
+    [PermissionAuthorize(PermissionType.CanCreateMessage)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,7 +51,7 @@ public class MessagesController(IMediator mediator) : ControllerBase
             : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanUpdateMessage)]
+    [PermissionAuthorize(PermissionType.CanUpdateMessage)]
     [Route("{messageId}")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -74,7 +74,7 @@ public class MessagesController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanDeleteMessage)]
+    [PermissionAuthorize(PermissionType.CanDeleteMessage)]
     [Route("{messageId}")]
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.UnreadElements.Commands.MarkTopicsAsRead;
 
@@ -14,7 +15,8 @@ public class MarkTopicAsReadCommand : IRequest<CustomResponse>
 }
 
 public class MarkTopicAsReadCommandHandler(IForumDbContext context,
-    IUserManager userManager) : IRequestHandler<MarkTopicAsReadCommand, CustomResponse>
+    IUserManager userManager,
+    ILogger<MarkTopicAsReadCommandHandler> logger) : IRequestHandler<MarkTopicAsReadCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(MarkTopicAsReadCommand command, CancellationToken cancellationToken)
     {
@@ -59,6 +61,7 @@ public class MarkTopicAsReadCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while marking the topic as read.");
             return new CustomResponse(ex);
         }
     }

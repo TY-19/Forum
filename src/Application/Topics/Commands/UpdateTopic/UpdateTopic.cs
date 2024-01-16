@@ -4,6 +4,7 @@ using Forum.Application.Forums.Queries.CheckIfForumIsOpen;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Topics.Commands.UpdateTopic;
 
@@ -16,7 +17,8 @@ public class UpdateTopicCommand : IRequest<CustomResponse>
 }
 
 public class UpdateTopicCommandHandler(IForumDbContext context,
-    IMediator mediator) : IRequestHandler<UpdateTopicCommand, CustomResponse>
+    IMediator mediator,
+    ILogger<UpdateTopicCommandHandler> logger) : IRequestHandler<UpdateTopicCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateTopicCommand command, CancellationToken cancellationToken)
     {
@@ -36,6 +38,7 @@ public class UpdateTopicCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while moving the topic.");
             return new CustomResponse(ex);
         }
     }

@@ -6,8 +6,8 @@ using Forum.Application.Permissions.Dtos;
 using Forum.Application.Permissions.Queries.CheckUserPermission;
 using Forum.Application.Permissions.Queries.GetUserPermissionScope;
 using Forum.Application.Users.Dtos;
-using Forum.Domain.Constants;
 using Forum.Domain.Entities;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +28,6 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
     {
         var user = await userManager.GetUserByNameAsync(request.UserName, cancellationToken);
 
-
         if (user == null || user.UserProfile.Id != request.ProfileId
             || !await HasPermissionToReadUserMessagesAsync(user.Id, cancellationToken))
         {
@@ -37,15 +36,13 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
 
         var scope = await mediator.Send(new GetUserPermissionScopeRequest()
         {
-            PermissionName = DefaultPermissions.CanReadForum,
+            PermType = PermissionType.CanReadForum,
             UserId = user.Id,
         }, cancellationToken);
 
 
         if (scope == null)
-        {
             return new PaginatedResponse<MessageDto>();
-        }
 
         IQueryable<Message> messages = context.UserProfiles
                 .Where(up => up.Id == request.ProfileId)
@@ -55,9 +52,7 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
                 .AsNoTracking();
 
         if (user.UserProfile.Id == request.ProfileId || scope.IsGlobal)
-        {
             return await GetPaginatedResponseAsync(request.RequestParameters, messages, user, cancellationToken);
-        }
 
         messages = await GetMessagesInScopeAsync(messages, scope, cancellationToken);
         return await GetPaginatedResponseAsync(request.RequestParameters, messages, user, cancellationToken);
@@ -70,7 +65,7 @@ public class GetUserMessagesRequestHandler(IForumDbContext context,
     {
         var response = await mediator.Send(new CheckUserPermissionRequest()
         {
-            PermissionName = DefaultPermissions.CanSeeUserMessages,
+            PermType = PermissionType.CanSeeUserMessages,
             UserId = userId,
         }, cancellationToken);
         return response.Succeeded;

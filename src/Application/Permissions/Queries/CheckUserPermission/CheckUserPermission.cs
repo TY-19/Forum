@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace Forum.Application.Permissions.Queries.CheckUserPermission;
 
 public class CheckUserPermissionRequest : IRequest<CustomResponse>
 {
-    public string PermissionName { get; set; } = null!;
+    public PermissionType PermType { get; set; }
     public string? UserId { get; set; }
     public string? UserName { get; set; }
     public int? ForumId { get; set; }
@@ -20,11 +21,8 @@ public class CheckUserPermissionRequestHandler(IForumDbContext context,
 {
     public async Task<CustomResponse> Handle(CheckUserPermissionRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.PermissionName))
-            return new CustomResponse() { Succeeded = false };
-
         var scopeIds = await GetAllowedScope(request.ForumId);
-        var allowedRoleIds = await GetAllowedRoleIdsAsync(request.PermissionName, scopeIds, cancellationToken);
+        var allowedRoleIds = await GetAllowedRoleIdsAsync(request.PermType, scopeIds, cancellationToken);
         var userRoles = await GetUserRolesAsync(request, cancellationToken);
         return await IsInAllowedRole(allowedRoleIds, userRoles, cancellationToken);
     }
@@ -42,16 +40,14 @@ public class CheckUserPermissionRequestHandler(IForumDbContext context,
         return allowedScope;
     }
 
-    private async Task<List<string>> GetAllowedRoleIdsAsync(string permissionName, List<int> scopeIds, CancellationToken cancellationToken)
-    {
-        return await context.Permissions
+    private async Task<List<string>> GetAllowedRoleIdsAsync(PermissionType permissionType, List<int> scopeIds, CancellationToken cancellationToken)
+        => await context.Permissions
             .Include(p => p.Roles)
-            .Where(p => p.Name != null && p.Name == permissionName &&
-                (p.IsGlobal || p.ForumId != null && scopeIds.Contains((int)p.ForumId)))
+            .Where(p => p.Type == permissionType &&
+                (p.IsGlobal || (p.ForumId != null && scopeIds.Contains((int)p.ForumId))))
             .SelectMany(p => p.Roles.Select(r => r.IdentityRoleId))
             .Distinct()
             .ToListAsync(cancellationToken);
-    }
 
     private async Task<List<string>> GetUserRolesAsync(CheckUserPermissionRequest request, CancellationToken cancellationToken)
     {

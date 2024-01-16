@@ -12,9 +12,7 @@ public class TopicForumDto
     public int MessagesCount { get; set; }
 
     public TopicForumDto()
-    {
-
-    }
+    { }
 
     public TopicForumDto(Topic topic)
     {

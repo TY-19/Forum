@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Forum.Application.Common.Behaviours;
-using Forum.Application.Common.Configurations;
 using Forum.Application.Common.Helpers;
 using Forum.Application.Common.Interfaces;
 using MediatR;
@@ -22,8 +21,6 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         });
 
-        services.AddScoped<IPermissionConfiguration, PermissionConfiguration>();
-        services.AddScoped<IPermissionHelper, PermissionHelper>();
         services.AddScoped(typeof(ISearchHelper<>), typeof(SearchHelper<>));
 
         return services;

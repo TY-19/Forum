@@ -5,7 +5,7 @@ using Forum.Application.Search.Queries.SearchForums;
 using Forum.Application.Search.Queries.SearchMessages;
 using Forum.Application.Search.Queries.SearchTopics;
 using Forum.Application.Topics.Dtos;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +16,7 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class SearchController(IMediator mediator) : ControllerBase
 {
-    [PermissionAuthorize(DefaultPermissions.CanSearchForForums)]
+    [PermissionAuthorize(PermissionType.CanSearchForForums)]
     [HttpGet]
     [Route("forums")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -33,7 +33,7 @@ public class SearchController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(request, cancellationToken));
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanSearchForTopics)]
+    [PermissionAuthorize(PermissionType.CanSearchForTopics)]
     [HttpGet]
     [Route("topics")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -50,7 +50,7 @@ public class SearchController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(request, cancellationToken));
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanSearchForMessages)]
+    [PermissionAuthorize(PermissionType.CanSearchForMessages)]
     [HttpGet]
     [Route("messages")]
     [ProducesResponseType(StatusCodes.Status200OK)]

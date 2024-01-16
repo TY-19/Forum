@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Permissions.Dtos;
 using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace Forum.Application.Permissions.Queries.GetUserPermissionScope;
 
 public class GetUserPermissionScopeRequest : IRequest<PermissionScopeDto>
 {
-    public string PermissionName { get; set; } = null!;
+    public PermissionType PermType { get; set; }
     public string? UserId { get; set; }
     public string? UserName { get; set; }
 }
@@ -26,7 +27,7 @@ public class GetUserPermissionScopeRequestHandler(IForumDbContext context, IUser
             .ToList();
 
         var permissions = await context.Permissions
-            .Where(p => p.Name == request.PermissionName
+            .Where(p => p.Type == request.PermType
                 && p.Roles.Any(r => appRoles.Contains(r.IdentityRoleId)))
             .ToListAsync(cancellationToken);
 
@@ -47,8 +48,7 @@ public class GetUserPermissionScopeRequestHandler(IForumDbContext context, IUser
 
         return new PermissionScopeDto()
         {
-            Name = request.PermissionName,
-            Description = permissions[0]?.Description,
+            Type = request.PermType,
             IsGlobal = permissions.Exists(p => p.IsGlobal),
             ForumIds = scope
         };

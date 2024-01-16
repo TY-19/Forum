@@ -35,14 +35,12 @@ public class SearchMessagesRequestHandler(IForumDbContext context,
     }
 
     private async Task<SearchResult<MessageDto>> GetSearchResultWithDtoAsync(SearchResult<Message> searchResult, CancellationToken cancellationToken)
-    {
-        return new SearchResult<MessageDto>()
+        => new()
         {
             Elements = await GetMessagesDtoAsync(searchResult.Elements, cancellationToken),
             HasNextPage = searchResult.HasNextPage,
             SkipElementsForNextPage = searchResult.SkipElementsForNextPage
         };
-    }
 
     private async Task<List<MessageDto>> GetMessagesDtoAsync(IEnumerable<Message> messages, CancellationToken cancellationToken)
     {

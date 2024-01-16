@@ -8,7 +8,7 @@ using Forum.Application.Topics.Dtos;
 using Forum.Application.Topics.Queries.GetTopic;
 using Forum.Application.UnreadElements.Commands.GetUnreadTopics;
 using Forum.Application.UnreadElements.Dtos;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using Forum.WebAPI.Common.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +19,7 @@ namespace Forum.WebAPI.Controllers;
 [ApiController]
 public class TopicsController(IMediator mediator) : ControllerBase
 {
-    [PermissionAuthorize(DefaultPermissions.CanReadTopic)]
+    [PermissionAuthorize(PermissionType.CanReadTopic)]
     [Route("~/api/unread")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,7 +41,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(command, cancellationToken));
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanReadTopic)]
+    [PermissionAuthorize(PermissionType.CanReadTopic)]
     [HttpGet]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -64,16 +64,19 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return topic?.ParentForumId == forumId ? Ok(topic) : NotFound();
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanCreateTopic)]
+    [PermissionAuthorize(PermissionType.CanCreateTopic)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult> CreateTopic(int forumId, CreateTopicCommand command, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateTopic(int forumId, TopicPostDto topic, CancellationToken cancellationToken)
     {
-        if (command.ParentForumId != forumId)
-            return BadRequest();
+        var command = new CreateTopicCommand()
+        {
+            ParentForumId = forumId,
+            Title = topic.Title,
+        };
 
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
@@ -81,7 +84,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
             : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanUpdateTopic)]
+    [PermissionAuthorize(PermissionType.CanUpdateTopic)]
     [HttpPut]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -101,7 +104,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanMoveTopic)]
+    [PermissionAuthorize(PermissionType.CanMoveTopic)]
     [HttpPut]
     [Route("{topicId}/move/{newForumId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -113,7 +116,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         var checkUserPermissionForDestination = await mediator.Send(
             new CheckUserPermissionRequest
             {
-                PermissionName = DefaultPermissions.CanMoveTopic,
+                PermType = PermissionType.CanMoveTopic,
                 ForumId = newForumId,
                 UserName = User.Identity?.Name
             }, cancellationToken);
@@ -132,7 +135,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanCloseTopic)]
+    [PermissionAuthorize(PermissionType.CanCloseTopic)]
     [HttpPut]
     [Route("{topicId}/close")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -144,7 +147,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return await ChangeTopicStatus(forumId, topicId, true, cancellationToken);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanOpenTopic)]
+    [PermissionAuthorize(PermissionType.CanOpenTopic)]
     [HttpPut]
     [Route("{topicId}/open")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -169,7 +172,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
-    [PermissionAuthorize(DefaultPermissions.CanDeleteTopic)]
+    [PermissionAuthorize(PermissionType.CanDeleteTopic)]
     [HttpDelete]
     [Route("{topicId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

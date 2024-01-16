@@ -2,9 +2,10 @@
 using Forum.Application.Common.Models;
 using Forum.Application.Permissions.Queries.CheckUserPermission;
 using Forum.Application.Topics.Queries.CheckIfTopicIsOpen;
-using Forum.Domain.Constants;
+using Forum.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Messages.Commands.DeleteMessage;
 
@@ -16,8 +17,10 @@ public class DeleteMessageCommand : IRequest<CustomResponse>
     public string UserName { get; set; } = null!;
 }
 
-public class DeleteMessageCommandHandler(IForumDbContext context, IUserManager userManager,
-    IMediator mediator) : IRequestHandler<DeleteMessageCommand, CustomResponse>
+public class DeleteMessageCommandHandler(IForumDbContext context,
+    IUserManager userManager,
+    IMediator mediator,
+    ILogger<DeleteMessageCommandHandler> logger) : IRequestHandler<DeleteMessageCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(DeleteMessageCommand command, CancellationToken cancellationToken)
     {
@@ -37,8 +40,7 @@ public class DeleteMessageCommandHandler(IForumDbContext context, IUserManager u
 
         var user = await userManager.GetUserByNameAsync(command.UserName, cancellationToken);
 
-        if (user == null
-            || (user.UserProfile.Id != message.UserProfileId
+        if (user == null || (user.UserProfile.Id != message.UserProfileId
                 && !await HasPermissionToDeleteMessage(command.ForumId, user.Id, cancellationToken)))
         {
             return new CustomResponse() { Succeeded = false, Message = $"You have no permission to update the message" };
@@ -52,6 +54,7 @@ public class DeleteMessageCommandHandler(IForumDbContext context, IUserManager u
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while deleting the message.");
             return new CustomResponse(ex);
         }
     }
@@ -61,7 +64,7 @@ public class DeleteMessageCommandHandler(IForumDbContext context, IUserManager u
         var command = new CheckUserPermissionRequest()
         {
             ForumId = forumId,
-            PermissionName = DefaultPermissions.CanDeleteMessage,
+            PermType = PermissionType.CanDeleteMessage,
             UserId = userId
         };
         return (await mediator.Send(command, cancellationToken)).Succeeded;

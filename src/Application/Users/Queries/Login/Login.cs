@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Users.Dtos;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Forum.Application.Users.Queries.Login;
@@ -11,7 +12,9 @@ public class LoginRequest : IRequest<LoginResponse>
     public string Password { get; set; } = null!;
 }
 
-public class LoginRequestHandler(IUserManager userManager, IJwtHandler jwtHandler) : IRequestHandler<LoginRequest, LoginResponse>
+public class LoginRequestHandler(IUserManager userManager,
+    IJwtHandler jwtHandler,
+    ILogger<LoginRequestHandler> logger) : IRequestHandler<LoginRequest, LoginResponse>
 {
     public async Task<LoginResponse> Handle(LoginRequest request, CancellationToken cancellationToken)
     {
@@ -26,6 +29,7 @@ public class LoginRequestHandler(IUserManager userManager, IJwtHandler jwtHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while setting the JWT token.");
             return new LoginResponse() { Succeeded = false, Message = ex.Message };
         }
 

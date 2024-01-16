@@ -6,7 +6,6 @@ public class CheckUserPermissionRequestValidator : AbstractValidator<CheckUserPe
 {
     public CheckUserPermissionRequestValidator()
     {
-        RuleFor(x => x.PermissionName).NotEmpty().MaximumLength(100);
         RuleFor(x => x.UserName).MaximumLength(100);
     }
 }

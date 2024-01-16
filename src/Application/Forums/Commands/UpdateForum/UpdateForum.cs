@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Forums.Commands.UpdateForum;
 
@@ -10,13 +11,13 @@ public class UpdateForumCommand : IRequest<CustomResponse>
 {
     public int Id { get; set; }
     public string? Name { get; set; }
-    public int? ParentForumId { get; set; }
     public bool? IsClosed { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
 }
 
-public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandler<UpdateForumCommand, CustomResponse>
+public class UpdateForumCommandHandler(IForumDbContext context,
+    ILogger<UpdateForumCommandHandler> logger) : IRequestHandler<UpdateForumCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(UpdateForumCommand command, CancellationToken cancellationToken)
     {
@@ -37,6 +38,7 @@ public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while updating the forum.");
             return new CustomResponse(ex);
         }
 
@@ -48,10 +50,6 @@ public class UpdateForumCommandHandler(IForumDbContext context) : IRequestHandle
         if (command.Name != null)
         {
             forum.Name = command.Name;
-        }
-        if (command.ParentForumId != null)
-        {
-            forum.ParentForumId = command.ParentForumId;
         }
         if (command.Category != null)
         {

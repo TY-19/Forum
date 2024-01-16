@@ -24,14 +24,12 @@ public class SearchTopicRequestHandler(IForumDbContext context,
     }
 
     private static SearchResult<TopicDto> GetSearchResultWithDto(SearchResult<Topic> searchResult)
-    {
-        return new SearchResult<TopicDto>()
+        => new()
         {
             Elements = GetTopicsDto(searchResult.Elements),
             HasNextPage = searchResult.HasNextPage,
             SkipElementsForNextPage = searchResult.SkipElementsForNextPage
         };
-    }
 
     private static List<TopicDto> GetTopicsDto(IEnumerable<Topic> topics)
     {

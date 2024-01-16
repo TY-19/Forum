@@ -38,12 +38,10 @@ public class GetAllRolesRequestHandler(IRoleManager roleManager) : IRequestHandl
     private const int maxPageSize = 100;
 
     private static IQueryable<RoleDto> OrderRoles(IQueryable<RoleDto> roles, RequestParameters parameters)
-    {
-        return parameters.OrderAscending switch
+        => parameters.OrderAscending switch
         {
             true => roles.OrderBy(r => r.RoleName),
             false => roles.OrderByDescending(r => r.RoleName),
             _ => roles
         };
-    }
 }

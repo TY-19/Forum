@@ -1,6 +1,7 @@
 ﻿using Forum.Application.Common.Interfaces;
 using Forum.Application.Common.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.SetPassword;
 
@@ -10,7 +11,8 @@ public class SetPasswordCommand : IRequest<CustomResponse>
     public string NewPassword { get; set; } = null!;
 }
 
-public class SetPasswordCommandHandler(IUserManager userManager) : IRequestHandler<SetPasswordCommand, CustomResponse>
+public class SetPasswordCommandHandler(IUserManager userManager,
+    ILogger<SetPasswordCommandHandler> logger) : IRequestHandler<SetPasswordCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(SetPasswordCommand command, CancellationToken cancellationToken)
     {
@@ -24,6 +26,7 @@ public class SetPasswordCommandHandler(IUserManager userManager) : IRequestHandl
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while setting the password.");
             return new CustomResponse(ex);
         }
     }

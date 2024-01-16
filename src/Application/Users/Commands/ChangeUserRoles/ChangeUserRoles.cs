@@ -2,6 +2,7 @@
 using Forum.Application.Common.Models;
 using Forum.Domain.Constants;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.ChangeUserRoles;
 
@@ -11,7 +12,9 @@ public class ChangeUserRolesCommand : IRequest<CustomResponse>
     public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
 }
 
-public class ChangeUserRolesCommandHandler(IUserManager userManager, IRoleManager roleManager) : IRequestHandler<ChangeUserRolesCommand, CustomResponse>
+public class ChangeUserRolesCommandHandler(IUserManager userManager,
+    IRoleManager roleManager,
+    ILogger<ChangeUserRolesCommandHandler> logger) : IRequestHandler<ChangeUserRolesCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(ChangeUserRolesCommand command, CancellationToken cancellationToken)
     {
@@ -33,6 +36,7 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager, IRoleManage
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while changing the user roles.");
             return new CustomResponse(ex);
         }
     }

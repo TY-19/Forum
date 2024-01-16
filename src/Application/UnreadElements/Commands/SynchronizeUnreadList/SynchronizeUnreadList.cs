@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.UnreadElements.Commands.SynchronizeUnreadList;
 
@@ -11,7 +12,8 @@ public class SynchronizeUnreadListCommand : IRequest<CustomResponse>
     public int ProfileId { get; set; }
 }
 
-public class SynchronizeUnreadListCommandHandler(IForumDbContext context) : IRequestHandler<SynchronizeUnreadListCommand, CustomResponse>
+public class SynchronizeUnreadListCommandHandler(IForumDbContext context,
+    ILogger<SynchronizeUnreadListCommandHandler> logger) : IRequestHandler<SynchronizeUnreadListCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(SynchronizeUnreadListCommand command, CancellationToken cancellationToken)
     {
@@ -60,6 +62,7 @@ public class SynchronizeUnreadListCommandHandler(IForumDbContext context) : IReq
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while synchronizing the list of unread messages");
             return new CustomResponse(ex);
         }
     }

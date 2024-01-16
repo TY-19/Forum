@@ -6,6 +6,7 @@ using Forum.Application.Users.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Messages.Commands.CreateMessage;
 
@@ -19,7 +20,8 @@ public class CreateMessageCommand : IRequest<CustomResponse<MessageDto>>
 
 public class CreateMessageCommandHandler(IForumDbContext context,
     IUserManager userManager,
-    IMediator mediator) : IRequestHandler<CreateMessageCommand, CustomResponse<MessageDto>>
+    IMediator mediator,
+    ILogger<CreateMessageCommandHandler> logger) : IRequestHandler<CreateMessageCommand, CustomResponse<MessageDto>>
 {
     public async Task<CustomResponse<MessageDto>> Handle(CreateMessageCommand command, CancellationToken cancellationToken)
     {
@@ -52,13 +54,13 @@ public class CreateMessageCommandHandler(IForumDbContext context,
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the message.");
             return new CustomResponse<MessageDto>(ex);
         }
     }
 
     private async Task<MessageDto> GetMessageDtoAsync(Message message, IUser user, CancellationToken cancellationToken)
-    {
-        return new MessageDto()
+        => new()
         {
             Id = message.Id,
             TopicId = message.TopicId,
@@ -74,5 +76,4 @@ public class CreateMessageCommandHandler(IForumDbContext context,
             Created = message.Created,
             Modified = message.Modified
         };
-    }
 }

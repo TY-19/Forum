@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Application.Forums.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Forums.Commands.CreateForum;
 
@@ -14,7 +15,8 @@ public class CreateForumCommand : IRequest<CustomResponse<ForumDto>>
     public string? Description { get; set; }
 }
 
-public class CreateForumCommandHandler(IForumDbContext context) : IRequestHandler<CreateForumCommand, CustomResponse<ForumDto>>
+public class CreateForumCommandHandler(IForumDbContext context,
+    ILogger<CreateForumCommandHandler> logger) : IRequestHandler<CreateForumCommand, CustomResponse<ForumDto>>
 {
     public async Task<CustomResponse<ForumDto>> Handle(CreateForumCommand command, CancellationToken cancellationToken)
     {
@@ -27,6 +29,7 @@ public class CreateForumCommandHandler(IForumDbContext context) : IRequestHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while creating the forum.");
             return new CustomResponse<ForumDto>(ex);
         }
 
@@ -34,19 +37,16 @@ public class CreateForumCommandHandler(IForumDbContext context) : IRequestHandle
     }
 
     private static ForumEntity ToForumEntity(CreateForumCommand command)
-    {
-        return new ForumEntity()
+        => new()
         {
             Name = command.Name,
             ParentForumId = command.ParentForumId,
             Category = command.Category,
             Description = command.Description,
         };
-    }
 
     private static ForumDto ToForumDto(ForumEntity forum)
-    {
-        return new ForumDto()
+        => new()
         {
             Id = forum.Id,
             ParentForumId = forum.ParentForumId,
@@ -54,5 +54,4 @@ public class CreateForumCommandHandler(IForumDbContext context) : IRequestHandle
             Category = forum.Category,
             Description = forum.Description
         };
-    }
 }

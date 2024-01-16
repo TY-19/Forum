@@ -15,9 +15,7 @@ public class SubforumDto
     public int TopicsCount { get; set; }
 
     public SubforumDto()
-    {
-
-    }
+    { }
     public SubforumDto(ForumEntity forum)
     {
         Id = forum.Id;

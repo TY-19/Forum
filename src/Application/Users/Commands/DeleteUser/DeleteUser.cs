@@ -2,6 +2,7 @@
 using Forum.Application.Common.Models;
 using Forum.Domain.Constants;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Users.Commands.DeleteUser;
 
@@ -10,7 +11,8 @@ public class DeleteUserCommand : IRequest<CustomResponse>
     public string UserId { get; set; } = null!;
 }
 
-public class DeleteUserCommandHandler(IUserManager userManager) : IRequestHandler<DeleteUserCommand, CustomResponse>
+public class DeleteUserCommandHandler(IUserManager userManager,
+    ILogger<DeleteUserCommandHandler> logger) : IRequestHandler<DeleteUserCommand, CustomResponse>
 {
     public async Task<CustomResponse> Handle(DeleteUserCommand command, CancellationToken cancellationToken)
     {
@@ -28,6 +30,7 @@ public class DeleteUserCommandHandler(IUserManager userManager) : IRequestHandle
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred while deleting the user.");
             return new CustomResponse(ex);
         }
     }
