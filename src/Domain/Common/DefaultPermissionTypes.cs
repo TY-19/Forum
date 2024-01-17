@@ -4,8 +4,8 @@ namespace Forum.Domain.Common;
 
 public static class DefaultPermissionTypes
 {
-    public static List<Permission> GetDefaultPermissions() => new()
-    {
+    public static List<Permission> GetDefaultPermissions() =>
+    [
         new Permission()
         {
             Type = Enums.PermissionType.CanReadForum,
@@ -240,5 +240,5 @@ public static class DefaultPermissionTypes
             Name = "CanRemovePermission",
             Description = "Can remove a permission",
         },
-    };
+    ];
 }
