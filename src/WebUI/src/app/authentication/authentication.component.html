@@ -1,0 +1,11 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="m-2 text-center">
+    <div class="m-2">
+        <input type="text" formControlName="userName" placeholder="Name" class="p-1">
+    </div>
+    <div class="m-2">
+        <input type="password" formControlName="password" placeholder="Password" class="p-1">
+    </div>
+    <button type="submit" class="bg-gray-600 p-1">Login</button>
+</form>
+{{response | json}}
+<button type="button" (click)="test()">Test</button>

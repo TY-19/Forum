@@ -1,6 +1,8 @@
-﻿using Forum.Application.Users.Commands.ChangePassword;
+﻿using System.Security.Claims;
+using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.UpdateUser;
+using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetUser;
 using Forum.Application.Users.Queries.Login;
 using MediatR;
@@ -25,7 +27,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     [Route("login")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken cancellationToken)
     {
         return Ok(await mediator.Send(request, cancellationToken));
     }

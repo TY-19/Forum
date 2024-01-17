@@ -104,13 +104,22 @@ public class ForumDbContextInitialiser(IConfiguration configuration,
 
     private async Task SetDefaultPermissionsForRoles()
     {
-        if (!flags["SeedDefault"])
+        
+        if (!await AreSomePermissionsForAdminAsync() && !flags["SeedDefault"])
             return;
 
         await SetDefaultPermissionsForRole(DefaultRoles.ADMIN, PermissionsConfiguration.AdminDefaultPermissions);
         await SetDefaultPermissionsForRole(DefaultRoles.MODERATOR, PermissionsConfiguration.ModeratorDefaultPermissions);
         await SetDefaultPermissionsForRole(DefaultRoles.USER, PermissionsConfiguration.UserDefaultPermissions);
         await SetDefaultPermissionsForRole(DefaultRoles.GUEST, PermissionsConfiguration.GuestDefaultPermissions);
+    }
+
+    private async Task<bool> AreSomePermissionsForAdminAsync()
+    {
+        return (await roleManager.Roles
+            .Include(r => r.ApplicationRole)
+            .FirstOrDefaultAsync(r => r.Name == DefaultRoles.ADMIN))
+            ?.ApplicationRole.Permissions.Any() ?? false;
     }
 
     private async Task SetDefaultPermissionsForRole(string roleName, IEnumerable<PermissionType> rolePermissions)
