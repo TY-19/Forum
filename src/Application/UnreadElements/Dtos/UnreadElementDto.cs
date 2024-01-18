@@ -7,5 +7,5 @@ public class UnreadElementDto
     public string Title { get; set; } = null!;
     public int MessageId { get; set; }
     public string MessageAutor { get; set; } = null!;
-    public DateTime Created { get; set; }
+    public DateTimeOffset Created { get; set; }
 }

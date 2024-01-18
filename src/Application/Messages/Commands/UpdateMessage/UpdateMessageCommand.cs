@@ -50,7 +50,7 @@ public class UpdateMessageCommandHandler(IForumDbContext context,
         }
 
         message.Text = command.Text;
-        message.Modified = DateTime.UtcNow;
+        message.Modified = DateTimeOffset.UtcNow;
 
         try
         {

@@ -41,7 +41,7 @@ public class CreateMessageCommandHandler(IForumDbContext context,
         {
             TopicId = command.TopicId,
             UserProfileId = user.UserProfile.Id,
-            Created = DateTime.UtcNow,
+            Created = DateTimeOffset.UtcNow,
             Text = command.Text
         };
 
