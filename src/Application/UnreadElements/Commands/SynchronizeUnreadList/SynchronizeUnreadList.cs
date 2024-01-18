@@ -31,7 +31,7 @@ public class SynchronizeUnreadListCommandHandler(IForumDbContext context,
             .Select(g => g.OrderBy(m => m.Created).FirstOrDefault())
             .ToListAsync(cancellationToken);
 
-        DateTime synchronizedNow = DateTime.UtcNow;
+        DateTimeOffset synchronizedNow = DateTimeOffset.UtcNow;
 
 
         var topicIdsAlreadyInUnread = await context.UnreadElements
