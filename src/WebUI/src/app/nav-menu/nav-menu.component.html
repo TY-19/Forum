@@ -1,1 +1,13 @@
-<a [routerLink]="['login']">Login</a>
+<div class="flex flex-wrap justify-between bg-amber-200 text-gray-700 font-semibold">
+  <div class="flex flex-wrap">
+    <a class="mx-4 hover:text-blue-600">Unread topics</a>
+    <a class="mx-4 hover:text-blue-600">Search</a>
+  </div>
+  <div *ngIf="isLoggedIn" class="flex flex-wrap">
+    <a (click)="logout()" class="mx-4 hover:text-blue-600">Logout</a>
+  </div>
+  <div *ngIf="!isLoggedIn" class="flex flex-wrap">
+    <a class="mx-4 hover:text-blue-600">Registration</a>
+    <a [routerLink]="['login']" class="mx-4 hover:text-blue-600">Login</a>
+  </div>
+</div>

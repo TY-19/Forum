@@ -11,7 +11,10 @@ import { LoginResponse } from "../common/models/login-response";
 
 export class AuthenticationService {
 
-    private readonly tokenKey: string = "token";
+    readonly tokenKey: string = "token";
+    readonly userNameKey: string = "userName";
+    readonly userProfileIdKey: string = "userProfileId";
+    readonly rolesKey: string = "roles";
 
     private _authStatus = new Subject<boolean>();
     public authStatus = this._authStatus.asObservable();
@@ -36,12 +39,33 @@ export class AuthenticationService {
                 if(response.succeeded && response.token)
                 {
                     this._authStatus.next(true);
-                    localStorage.setItem(this.tokenKey, response.token);
+                    this.writeToLocalStorage(response);
                 }
             }));
     }
 
     logout(): void {
+        this.removeUserItemsFromLocalStorage();
+        this._authStatus.next(false);
+    }
+
+    private writeToLocalStorage(response: LoginResponse): void {
+        if(response.token) {
+            localStorage.setItem(this.tokenKey, response.token);
+        }
+        if(response.userName) {
+            localStorage.setItem(this.userNameKey, response.userName)
+        }
+        if(response.userProfileId) {
+            localStorage.setItem(this.userProfileIdKey, response.userProfileId.toString())
+        }
+        localStorage.setItem(this.rolesKey, JSON.stringify(response.roles));
+    }
+
+    private removeUserItemsFromLocalStorage(): void {
         localStorage.removeItem(this.tokenKey);
+        localStorage.removeItem(this.userNameKey);
+        localStorage.removeItem(this.userProfileIdKey);
+        localStorage.removeItem(this.rolesKey);
     }
 }
