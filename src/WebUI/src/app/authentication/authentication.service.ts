@@ -15,7 +15,7 @@ export class AuthenticationService {
 
     private _authStatus = new Subject<boolean>();
     public authStatus = this._authStatus.asObservable();
-    
+
     constructor(private http: HttpClient) {
         this._authStatus.next(this.isAuthenticated());
 

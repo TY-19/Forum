@@ -11,7 +11,7 @@ describe('ForumsComponent', () => {
       imports: [ForumsComponent]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(ForumsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

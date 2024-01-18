@@ -18,11 +18,9 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './authentication.component.scss'
 })
 export class AuthenticationComponent implements OnInit {
-  
   form!: FormGroup;
   loginResponse!: LoginResponse;
 
-  public response: object = null!;
   constructor(private router: Router, private http: HttpClient,
     private authenticationService: AuthenticationService) {
 
@@ -38,7 +36,7 @@ export class AuthenticationComponent implements OnInit {
       password: new FormControl('', Validators.required),
     });
   }
-  
+
   onSubmit() {
     if (this.form.valid) {
       const loginRequest: LoginRequest = {
@@ -62,8 +60,5 @@ export class AuthenticationComponent implements OnInit {
       });
   }
 
-  test() {
-    this.http.get(baseUrl + "/api/users")
-      .subscribe((result) => this.response = result);
-  }
+
 }

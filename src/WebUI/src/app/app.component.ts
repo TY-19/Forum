@@ -8,7 +8,7 @@ import { ForumsComponent } from './forums/forums.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, 
+  imports: [CommonModule, RouterOutlet,
     HeaderComponent, NavMenuComponent, ForumsComponent ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

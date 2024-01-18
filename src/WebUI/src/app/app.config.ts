@@ -14,4 +14,4 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 
-export const baseUrl = "http://localhost:40080";
+export const baseUrl = "https://localhost:40443";
