@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Forum.Application.Common.Models;
 using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.UpdateUser;

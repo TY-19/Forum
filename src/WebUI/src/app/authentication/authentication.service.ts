@@ -1,9 +1,12 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpResponse, HttpResponseBase } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, Subject, tap } from "rxjs";
+import { Observable, Subject, observeOn, tap } from "rxjs";
 import { LoginRequest } from "../common/models/login-request";
 import { baseUrl } from "../app.config";
 import { LoginResponse } from "../common/models/login-response";
+import { RegistrationRequest } from "../common/models/registration-request";
+import { CustomResponseGeneric } from "../common/models/custom-response";
+import { User } from "../common/models/user";
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +33,20 @@ export class AuthenticationService {
 
     isAuthenticated(): boolean {
         return this.getToken() != null;
+    }
+
+    registration(request: RegistrationRequest): Observable<HttpResponseBase> {
+        const url: string = baseUrl + "/api/account/registration";
+        return this.http.post<HttpResponseBase>(url, request, {observe: 'response'})
+            .pipe(tap(response => {
+                if(response.status === 204) {
+                    let loginRequest: LoginRequest = {
+                        userName: request.userName,
+                        password: request.password
+                    };
+                    this.login(loginRequest).subscribe();
+                }
+            }));
     }
 
     login(request: LoginRequest): Observable<LoginResponse> {

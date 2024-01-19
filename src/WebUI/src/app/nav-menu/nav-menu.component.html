@@ -3,11 +3,15 @@
     <a class="mx-4 hover:text-blue-600">Unread topics</a>
     <a class="mx-4 hover:text-blue-600">Search</a>
   </div>
-  <div *ngIf="isLoggedIn" class="flex flex-wrap">
+  @if(isLoggedIn) {
+  <div class="flex flex-wrap">
+    <a class="mx-4 hover:text-blue-600">Account</a>
     <a (click)="logout()" class="mx-4 hover:text-blue-600">Logout</a>
   </div>
-  <div *ngIf="!isLoggedIn" class="flex flex-wrap">
-    <a class="mx-4 hover:text-blue-600">Registration</a>
+  } @else {
+  <div class="flex flex-wrap">
+    <a [routerLink]="['registration']" class="mx-4 hover:text-blue-600">Registration</a>
     <a [routerLink]="['login']" class="mx-4 hover:text-blue-600">Login</a>
   </div>
+  }
 </div>
