@@ -9,7 +9,7 @@ namespace Forum.Application.Users.Commands.ChangeUserRoles;
 public class ChangeUserRolesCommand : IRequest<CustomResponse>
 {
     public string UserId { get; set; } = null!;
-    public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
+    public IEnumerable<string> Roles { get; set; } = [];
 }
 
 public class ChangeUserRolesCommandHandler(IUserManager userManager,
@@ -31,7 +31,10 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager,
             return new CustomResponse()
             {
                 Succeeded = addingRolesResult.Succeeded && removingRolesResult.Succeeded,
-                Message = addingRolesResult.Message + " \n" + removingRolesResult.Message
+                Message = addingRolesResult.Errors.Any() || removingRolesResult.Errors.Any()
+                    ? "Some roles was not added or removed."
+                    : null,
+                Errors = [..addingRolesResult.Errors, ..removingRolesResult.Errors]
             };
         }
         catch (Exception ex)
@@ -43,7 +46,8 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager,
 
     private async Task<CustomResponse> AddRolesAsync(IUser user, IEnumerable<string> rolesToAdd, CancellationToken cancellationToken)
     {
-        var response = new CustomResponse() { Succeeded = true };
+        bool succeeded = true;
+        List<string> errors = [];
         var allRoles = await roleManager.GetAllRolesAsync(cancellationToken);
         List<string> notRoles = [];
         foreach (var role in rolesToAdd)
@@ -51,8 +55,8 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager,
             if (!allRoles.Select(r => r.Name).Contains(role))
             {
                 notRoles.Add(role);
-                response.Succeeded = false;
-                response.Message = $"The role {role} does not exist. ";
+                succeeded = false;
+                errors.Add($"The role {role} does not exist. ");
             }
         }
         rolesToAdd = rolesToAdd.Except(notRoles);
@@ -60,28 +64,29 @@ public class ChangeUserRolesCommandHandler(IUserManager userManager,
         var addingResult = await userManager.AddToRolesAsync(user, rolesToAdd, cancellationToken);
         if (!addingResult.Succeeded)
         {
-            response.Succeeded = false;
-            response.Message += addingResult.Message;
+            succeeded = false;
+            errors.Add(addingResult.Message ?? string.Empty);
         }
-        return response;
+        return new CustomResponse() { Succeeded = succeeded, Errors = errors };;
     }
 
     private async Task<CustomResponse> RemoveRolesAsync(IUser user, IEnumerable<string> rolesToRemove, CancellationToken cancellationToken)
     {
-        var response = new CustomResponse { Succeeded = true };
+        bool succeeded = true;
+        List<string> errors = [];
         if (rolesToRemove.Contains(DefaultRoles.ADMIN) && await IsUserTheLastAdminAsync(user.Id!, cancellationToken))
         {
             rolesToRemove = rolesToRemove.Except(new string[] { DefaultRoles.ADMIN });
-            response.Succeeded = false;
-            response.Message += $"The user was not removed from the role {DefaultRoles.ADMIN} because they are the last admin";
+            succeeded = false;
+            errors.Add($"The user was not removed from the role {DefaultRoles.ADMIN} because they are the last admin");
         }
         var removingResult = await userManager.RemoveFromRolesAsync(user, rolesToRemove, cancellationToken);
         if (!removingResult.Succeeded)
         {
-            response.Succeeded = false;
-            response.Message += removingResult.Message;
+            succeeded = false;
+            errors.Add(removingResult.Message ?? string.Empty);
         }
-        return response;
+        return new CustomResponse { Succeeded = succeeded, Errors = errors };
     }
 
     private async Task<bool> IsUserTheLastAdminAsync(string userId, CancellationToken cancellationToken)

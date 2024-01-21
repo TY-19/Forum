@@ -64,7 +64,7 @@ public class PermissionsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetPermissionById), new { response.Payload.Id }, response.Payload)
-            : BadRequest(response.Message);
+            : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdatePermission)]
@@ -80,7 +80,7 @@ public class PermissionsController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanRemovePermission)]
@@ -93,6 +93,6 @@ public class PermissionsController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeletePermission(int id, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeletePermissionCommand() { Id = id }, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 }

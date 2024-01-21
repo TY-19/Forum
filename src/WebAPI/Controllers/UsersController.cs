@@ -67,7 +67,7 @@ public class UsersController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetUserByProfileId), new { profileId = response.Payload.UserProfileId }, response.Payload)
-            : BadRequest(response.Message);
+            : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdateUser)]
@@ -87,10 +87,10 @@ public class UsersController(IMediator mediator) : ControllerBase
             UpdatedEmail = user.UpdatedEmail
         };
         if (userId != command.UserId)
-            return BadRequest();
+            return BadRequest(new CustomResponse() {Succeeded = false, Message = "Id from the url doesn't match updating user id"});
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanChangeUserPassword)]
@@ -109,7 +109,7 @@ public class UsersController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [Route("{userId}/roles")]
@@ -127,7 +127,7 @@ public class UsersController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanDeleteUser)]
@@ -140,7 +140,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeleteUser(string userId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteUserCommand() { UserId = userId }, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanSeeUserMessages)]

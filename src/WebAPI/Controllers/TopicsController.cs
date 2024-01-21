@@ -81,7 +81,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetTopic), new { forumId, topicId = response.Payload.Id }, response.Payload)
-            : BadRequest(response.Message);
+            : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdateTopic)]
@@ -101,7 +101,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanMoveTopic)]
@@ -132,7 +132,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanCloseTopic)]
@@ -169,7 +169,7 @@ public class TopicsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanDeleteTopic)]
@@ -182,6 +182,6 @@ public class TopicsController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeleteTopic(int forumId, int topicId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteTopicCommand() { TopicId = topicId, ForumId = forumId }, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 }

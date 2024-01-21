@@ -48,7 +48,7 @@ public class MessagesController(IMediator mediator) : ControllerBase
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetMessage),
                 new { forumId, topicId, messageId = response.Payload.Id }, response.Payload)
-            : BadRequest(response.Message);
+            : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdateMessage)]
@@ -71,7 +71,7 @@ public class MessagesController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanDeleteMessage)]
@@ -92,6 +92,6 @@ public class MessagesController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 }

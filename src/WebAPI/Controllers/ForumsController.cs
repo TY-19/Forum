@@ -55,7 +55,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
             ? CreatedAtAction(nameof(GetForum), new { id = response.Payload.Id }, response.Payload)
-            : BadRequest(response.Message);
+            : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdateForum)]
@@ -76,7 +76,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanMoveForum)]
@@ -100,7 +100,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanCloseForum)]
@@ -136,7 +136,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanDeleteForum)]
@@ -149,7 +149,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeleteForum(int forumId, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteForumCommand() { Id = forumId }, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     private async Task<bool> CheckUserPermissionAsync(PermissionType permissionType, int? forumId, CancellationToken cancellationToken)

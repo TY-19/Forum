@@ -44,7 +44,7 @@ public class RolesController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> CreateRole(CreateRoleCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanUpdateRole)]
@@ -56,7 +56,7 @@ public class RolesController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> UpdateRole(UpdateRoleCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanAddPermission)]
@@ -69,7 +69,7 @@ public class RolesController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> UpdateRolePermissions(UpdateRolePermissionsCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [PermissionAuthorize(PermissionType.CanDeleteRole)]
@@ -82,6 +82,6 @@ public class RolesController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> DeleteRole(string roleName, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(new DeleteRoleCommand() { RoleName = roleName }, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 }

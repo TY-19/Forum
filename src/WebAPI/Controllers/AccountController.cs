@@ -20,7 +20,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> Registration(CreateUserCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [Route("login")]
@@ -52,7 +52,7 @@ public class AccountController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
     [Route("changePassword")]
@@ -65,6 +65,6 @@ public class AccountController(IMediator mediator) : ControllerBase
             return BadRequest();
 
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response.Message);
+        return response.Succeeded ? NoContent() : BadRequest(response);
     }
 }

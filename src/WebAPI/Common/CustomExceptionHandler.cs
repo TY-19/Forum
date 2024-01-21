@@ -1,6 +1,6 @@
 ﻿using Forum.Application.Common.Exceptions;
+using Forum.Application.Common.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.WebAPI.Common;
 
@@ -35,10 +35,11 @@ public class CustomExceptionHandler : IExceptionHandler
 
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-        await httpContext.Response.WriteAsJsonAsync(new ValidationProblemDetails(ex.Errors)
+        await httpContext.Response.WriteAsJsonAsync(new CustomResponse()
         {
-            Status = StatusCodes.Status400BadRequest,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+            Message = "One or more validation errors have occured",
+            Succeeded = false,
+            Errors = ex.Errors
         });
     }
 
