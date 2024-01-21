@@ -1,12 +1,10 @@
-import { HttpClient, HttpResponse, HttpResponseBase } from "@angular/common/http";
+import { HttpClient, HttpResponseBase } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, Subject, observeOn, tap } from "rxjs";
+import { Observable, Subject, tap } from "rxjs";
 import { LoginRequest } from "../common/models/login-request";
 import { baseUrl } from "../app.config";
 import { LoginResponse } from "../common/models/login-response";
 import { RegistrationRequest } from "../common/models/registration-request";
-import { CustomResponseGeneric } from "../common/models/custom-response";
-import { User } from "../common/models/user";
 
 @Injectable({
     providedIn: 'root',

@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using Forum.Application.Common.Models;
-using Forum.Application.Users.Commands.ChangePassword;
+﻿using Forum.Application.Users.Commands.ChangePassword;
 using Forum.Application.Users.Commands.CreateUser;
 using Forum.Application.Users.Commands.UpdateUser;
 using Forum.Application.Users.Dtos;
@@ -22,7 +20,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> Registration(CreateUserCommand command, CancellationToken cancellationToken)
     {
         var response = await mediator.Send(command, cancellationToken);
-        return response.Succeeded ? NoContent() : BadRequest(response);
+        return response.Succeeded ? NoContent() : BadRequest(response.Message);
     }
 
     [Route("login")]

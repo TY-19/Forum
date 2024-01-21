@@ -1,16 +1,72 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="m-2 py-8 text-center">
     <div class="m-2">
         <input type="text" formControlName="userName" placeholder="Name" class="p-1">
+        @if(form.controls['userName'].touched && form.controls['userName'].errors) { 
+            <p>
+                @if(form.controls['userName'].errors['required']) {
+                    <span class="text-red-900">Username is required</span>
+                }
+                @if(form.controls['userName'].errors['minlength']) {
+                    <span class="text-red-900">Username must be at least 3 characters long.</span>
+                }
+                @if(form.controls['userName'].errors['maxlength']) {
+                    <span class="text-red-900">Username can be at most 100 characters long.</span>
+                }
+                @if(form.controls['userName'].errors['pattern']) {
+                    <span class="text-red-900">Username must contain only allowed characters.
+                        <br>{{getInvalidCharacters(form.controls['userName'].value)}} are invalid characters
+                    </span>
+                }
+            </p>
+        }
     </div>
     <div class="m-2">
         <input type="text" formControlName="userEmail" placeholder="Email" class="p-1">
+        @if(form.controls['userEmail'].touched && form.controls['userEmail'].errors) { 
+            <p>
+                @if(form.controls['userEmail'].errors['required']) {
+                    <span class="text-red-900">Email is required</span>
+                }
+                @if(form.controls['userEmail'].errors['email']) {
+                    <span class="text-red-900">Provide a valid email.</span>
+                }
+                @if(form.controls['userEmail'].errors['maxlength']) {
+                    <span class="text-red-900">Email can be at most 500 characters long.</span>
+                }
+            </p>
+        }
     </div>
     <div class="m-2">
         <input type="password" formControlName="password" placeholder="Password" class="p-1">
+        @if(form.controls['password'].touched && form.controls['password'].errors) { 
+            <p>
+                @if(form.controls['password'].errors['required']) {
+                    <span class="text-red-900">Password is required</span>
+                }
+                @if(form.controls['password'].errors['minlength']) {
+                    <span class="text-red-900">Password must be at least 8 characters long.</span>
+                }
+                @if(form.controls['password'].errors['maxlength']) {
+                    <span class="text-red-900">Password can be at most 50 characters long.</span>
+                }
+            </p>
+        }
     </div>
     <div class="m-2">
         <input type="password" formControlName="passwordConfirm" placeholder="Confirm Password" class="p-1">
+        @if(form.controls['passwordConfirm'].touched && (form.errors || form.controls['passwordConfirm'].errors)) { 
+            <p>
+                @if(form.controls['passwordConfirm'].errors?.['required']) {
+                    <span class="text-red-900">Confirm the password</span>
+                } @else if (form.errors?.['mismatch']) {
+                    <span class="text-red-900">The passwords doesn't match</span>
+                }
+            </p>
+        }
     </div>
+    @if(registrationError) {
+        <span class="whitespace-pre-line text-red-900">{{registrationError}}</span>
+    }
     <button type="submit" class="text-white bg-amber-600 hover:bg-amber-700 
         font-medium rounded-lg text-sm px-5 py-2.5 my-2">
         Register

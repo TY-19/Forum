@@ -5,7 +5,6 @@ import { AuthenticationService } from './authentication.service';
 import { LoginRequest } from '../common/models/login-request';
 import { LoginResponse } from '../common/models/login-response';
 import { Router } from '@angular/router';
-import { baseUrl } from '../app.config';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
