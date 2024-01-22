@@ -1,0 +1,22 @@
+<div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-2">
+            <div>Name:</div>
+            <div class="mb-2 max-w-60">
+                <input type="text" formControlName="userName">
+                <app-username-validation [form]="form" [controlName]="'userName'"></app-username-validation>
+            </div>
+            <div>Email:</div>
+            <div class="mb-2 max-w-60">
+                <input type="text" formControlName="userEmail">
+                <app-email-validation [form]="form" [controlName]="'userEmail'"></app-email-validation>
+            </div>
+        </div>
+        <button type="submit" class="button button-primary">
+            Save
+        </button>
+        <button type="button" (click)="changeToViewMode()" class="button button-secondary ml-4">
+            Cancel
+        </button>
+    </form>
+</div>

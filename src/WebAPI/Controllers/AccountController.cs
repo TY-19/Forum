@@ -35,7 +35,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> ViewProfile(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> ViewProfile(CancellationToken cancellationToken)
     {
         var userName = User.Identity?.Name;
         var user = await mediator.Send(new GetUserRequest() { UserName = userName }, cancellationToken);
@@ -44,7 +44,7 @@ public class AccountController(IMediator mediator) : ControllerBase
 
     [Route("update")]
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdateProfile(UpdateUserCommand command, CancellationToken cancellationToken)
     {
@@ -57,7 +57,7 @@ public class AccountController(IMediator mediator) : ControllerBase
 
     [Route("changePassword")]
     [HttpPut]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ChangePassword(ChangePasswordCommand command, CancellationToken cancellationToken)
     {

@@ -2,6 +2,6 @@ export interface User {
     id: string,
     userName: string | null,
     email: string | null,
-    userProfileOd: number | null,
+    userProfileId: number | null,
     roles: string[]
 }

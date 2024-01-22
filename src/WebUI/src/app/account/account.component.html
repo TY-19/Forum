@@ -1,0 +1,28 @@
+<div class="py-4 m-2 flex text-center bg-amber-100">
+    <div class="flex-shrink-0 w-1/5 min-w-20 h-full bg-fuchsia-200">
+        <div (click)="changeTab(ProfileTab.General); changeMode(DisplayMode.View)" class="hover:bg-fuchsia-300">
+            General
+        </div>
+        <div (click)="changeTab(ProfileTab.Security);" class="hover:bg-fuchsia-300">
+            Security
+        </div>
+    </div>
+    <div class="m-auto">
+        @if(profileTab === ProfileTab.General) {
+            @if(mode === DisplayMode.View) {
+                <app-account-view [profile]="profile"
+                    (changeMode)="changeMode($event)">
+                </app-account-view>
+            }
+            @if(mode === DisplayMode.Edit) {
+                <app-account-edit [profile]="profile"
+                    (changeMode)="changeMode($event)"
+                    (hasBeenUpdated)="getUpdatedProfile($event)">
+                </app-account-edit>
+            }
+        }
+        @if(profileTab === ProfileTab.Security) {
+            <app-account-security></app-account-security>
+        }
+    </div>
+</div>

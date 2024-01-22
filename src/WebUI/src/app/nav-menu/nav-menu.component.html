@@ -5,7 +5,7 @@
   </div>
   @if(isLoggedIn) {
   <div class="flex flex-wrap">
-    <a class="mx-4 hover:text-blue-600">Account</a>
+    <a [routerLink]="['profile']" class="mx-4 hover:text-blue-600">Account</a>
     <a (click)="logout()" class="mx-4 hover:text-blue-600">Logout</a>
   </div>
   } @else {

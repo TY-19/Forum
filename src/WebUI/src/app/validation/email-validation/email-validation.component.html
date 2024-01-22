@@ -1,0 +1,13 @@
+@if(form.controls[controlName].touched && form.controls[controlName].errors) { 
+    <p>
+        @if(form.controls[controlName].errors?.['required']) {
+            <span class="text-red-900">Email is required</span>
+        }
+        @if(form.controls[controlName].errors?.['email']) {
+            <span class="text-red-900">Provide a valid email.</span>
+        }
+        @if(form.controls[controlName].errors?.['maxlength']) {
+            <span class="text-red-900">Email can be at most 500 characters long.</span>
+        }
+    </p>
+}

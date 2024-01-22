@@ -7,11 +7,14 @@ import { Router } from '@angular/router';
 import { fieldsEqual } from '../../common/validators/fields-equal';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpResponseHelper } from '../../common/helpers/http-response-helper';
+import { UsernameValidationComponent } from '../../validation/username-validation/username-validation.component';
+import { EmailValidationComponent } from '../../validation/email-validation/email-validation.component';
 
 @Component({
   selector: 'app-registration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,
+    UsernameValidationComponent, EmailValidationComponent],
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss'
 })
@@ -39,7 +42,6 @@ export class RegistrationComponent {
   }
 
   onSubmit() {
-    console.log(this.form);
     if (this.form.valid) {
       const registrationRequest: RegistrationRequest = {
         userName: this.form?.controls['userName'].value,
@@ -67,12 +69,5 @@ export class RegistrationComponent {
           }
         }
       });
-  }
-
-  protected getInvalidCharacters(input: string) {
-    const pattern = /[^a-zA-Z0-9\-._@+ абвгґдеєжзиіїйклмнопрстуфхцчшщьюяАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ]/g;
-    const regex = new RegExp(pattern);
-    const matches = input.match(regex);
-    return matches?.map(match => match[0]) || [];
   }
 }

@@ -1,0 +1,22 @@
+<div>
+    <div class="grid grid-cols-2 divide-y-2 divide-red-300">
+        <div>ProfileId:</div>
+        <div class="border-none">{{profile?.userProfileId}}</div>
+
+        <div>Name:</div>
+        <div>{{profile?.userName}}</div>
+
+        <div>Email:</div>
+        <div>{{profile?.email}}</div>
+
+        <div>Roles:</div>
+        <div>
+            @for(role of profile?.roles; track role) {
+                {{role}}
+            }
+        </div>
+    </div>
+    <button type="button" (click)="changeToEditMode()" class="button button-primary">
+        Edit profile
+    </button>
+</div>

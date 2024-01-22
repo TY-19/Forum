@@ -1,0 +1,18 @@
+@if(form.controls[controlName].touched && form.controls[controlName].errors) { 
+    <p>
+        @if(form.controls[controlName].errors?.['required']) {
+            <span class="text-red-900">Username is required</span>
+        }
+        @if(form.controls[controlName].errors?.['minlength']) {
+            <span class="text-red-900">Username must be at least 3 characters long.</span>
+        }
+        @if(form.controls[controlName].errors?.['maxlength']) {
+            <span class="text-red-900">Username can be at most 100 characters long.</span>
+        }
+        @if(form.controls[controlName].errors?.['pattern']) {
+            <span class="text-red-900">Username must contain only allowed characters.
+                <br>{{getInvalidCharacters(form.controls[controlName].value)}} are invalid characters
+            </span>
+        }
+    </p>
+}
