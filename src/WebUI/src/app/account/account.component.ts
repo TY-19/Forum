@@ -6,11 +6,14 @@ import { AccountViewComponent } from './account-view/account-view.component';
 import { DisplayMode } from '../common/enums/display-mode';
 import { AccountEditComponent } from './account-edit/account-edit.component';
 import { AccountSecurityComponent } from './account-security/account-security.component';
+import { ProfileTab } from '../common/enums/profile-tab';
+import { AccountChangePasswordComponent } from './account-change-password/account-change-password.component';
 
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, AccountViewComponent, AccountEditComponent, AccountSecurityComponent],
+  imports: [CommonModule, AccountViewComponent, AccountEditComponent,
+    AccountSecurityComponent, AccountChangePasswordComponent],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss'
 })
@@ -49,9 +52,4 @@ export class AccountComponent implements OnInit {
       this.getProfile();
     }
   }
-}
-
-enum ProfileTab {
-  General = 0,
-  Security = 1
 }

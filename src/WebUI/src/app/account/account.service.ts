@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { User } from "../common/models/user";
 import { baseUrl } from "../app.config";
 import { ProfileUpdate } from "../common/models/profile-update";
+import { ChangePasswordModel } from "../common/models/change-password";
 
 @Injectable({
     providedIn: 'root',
@@ -22,5 +23,10 @@ export class AccountService {
     updateProfile(profile: ProfileUpdate): Observable<HttpResponseBase> {
         const url = baseUrl + "/api/account/update";
         return this.http.put<HttpResponseBase>(url, profile, {observe: 'response'});
+    }
+
+    changePassword(passwordModel: ChangePasswordModel): Observable<HttpResponseBase> {
+        const url = baseUrl + "/api/account/changePassword";
+        return this.http.put<HttpResponseBase>(url, passwordModel, {observe: 'response'});
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistrationRequest } from '../../common/models/registration-request';
@@ -9,16 +9,18 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpResponseHelper } from '../../common/helpers/http-response-helper';
 import { UsernameValidationComponent } from '../../validation/username-validation/username-validation.component';
 import { EmailValidationComponent } from '../../validation/email-validation/email-validation.component';
+import { PasswordValidationComponent } from '../../validation/password-validation/password-validation.component';
+import { PasswordConfirmValidationComponent } from '../../validation/password-confirm-validation/password-confirm-validation.component';
 
 @Component({
   selector: 'app-registration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,
-    UsernameValidationComponent, EmailValidationComponent],
+  imports: [CommonModule, ReactiveFormsModule, UsernameValidationComponent,
+    EmailValidationComponent, PasswordValidationComponent, PasswordConfirmValidationComponent],
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss'
 })
-export class RegistrationComponent {
+export class RegistrationComponent implements OnInit {
   form!: FormGroup;
   registrationError: string | null = null;
 

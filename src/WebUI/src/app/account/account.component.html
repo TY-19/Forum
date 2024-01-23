@@ -22,7 +22,12 @@
             }
         }
         @if(profileTab === ProfileTab.Security) {
-            <app-account-security></app-account-security>
+            <app-account-security (changeTab)="changeTab($event)">
+            </app-account-security>
+        }
+        @if(profileTab === ProfileTab.ChangePassword) {
+            <app-account-change-password (changeTab)="changeTab($event)">
+            </app-account-change-password>
         }
     </div>
 </div>

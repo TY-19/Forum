@@ -9,31 +9,11 @@
     </div>
     <div class="m-2">
         <input type="password" formControlName="password" placeholder="Password" class="p-1">
-        @if(form.controls['password'].touched && form.controls['password'].errors) { 
-            <p>
-                @if(form.controls['password'].errors['required']) {
-                    <span class="text-red-900">Password is required</span>
-                }
-                @if(form.controls['password'].errors['minlength']) {
-                    <span class="text-red-900">Password must be at least 8 characters long.</span>
-                }
-                @if(form.controls['password'].errors['maxlength']) {
-                    <span class="text-red-900">Password can be at most 50 characters long.</span>
-                }
-            </p>
-        }
+        <app-password-validation [form]="form" [controlName]="'password'"></app-password-validation>
     </div>
     <div class="m-2">
         <input type="password" formControlName="passwordConfirm" placeholder="Confirm Password" class="p-1">
-        @if(form.controls['passwordConfirm'].touched && (form.errors || form.controls['passwordConfirm'].errors)) { 
-            <p>
-                @if(form.controls['passwordConfirm'].errors?.['required']) {
-                    <span class="text-red-900">Confirm the password</span>
-                } @else if (form.errors?.['mismatch']) {
-                    <span class="text-red-900">The passwords doesn't match</span>
-                }
-            </p>
-        }
+        <app-password-confirm-validation [form]="form" [controlName]="'passwordConfirm'"></app-password-confirm-validation>
     </div>
     @if(registrationError) {
         <p class="whitespace-pre-line text-red-900">{{registrationError}}</p>

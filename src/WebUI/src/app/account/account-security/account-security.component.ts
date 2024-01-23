@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProfileTab } from '../../common/enums/profile-tab';
 
 @Component({
   selector: 'app-account-security',
@@ -9,5 +10,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './account-security.component.scss'
 })
 export class AccountSecurityComponent {
-
+  @Output() changeTab = new EventEmitter<ProfileTab>();
+  
+  toChangePassword() {
+    this.changeTab.emit(ProfileTab.ChangePassword);
+  }
 }

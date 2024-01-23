@@ -5,6 +5,7 @@ using Forum.Application.Users.Dtos;
 using Forum.Application.Users.Queries.GetUser;
 using Forum.Application.Users.Queries.Login;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.WebAPI.Controllers;
@@ -31,6 +32,7 @@ public class AccountController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(request, cancellationToken));
     }
 
+    [Authorize]
     [Route("view")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -42,6 +44,7 @@ public class AccountController(IMediator mediator) : ControllerBase
         return user == null ? NotFound() : Ok(user);
     }
 
+    [Authorize]
     [Route("update")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -55,14 +58,19 @@ public class AccountController(IMediator mediator) : ControllerBase
         return response.Succeeded ? NoContent() : BadRequest(response);
     }
 
+    [Authorize]
     [Route("changePassword")]
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ChangePassword(ChangePasswordCommand command, CancellationToken cancellationToken)
+    public async Task<ActionResult> ChangePassword(ChangePasswordDto dto, CancellationToken cancellationToken)
     {
-        if (User.Identity?.Name == null || command.UserName != User.Identity?.Name)
-            return BadRequest();
+        var command = new ChangePasswordCommand()
+        {
+            UserName = User.Identity?.Name ?? "",
+            CurrentPassword = dto.CurrentPassword,
+            NewPassword = dto.NewPassword
+        };
 
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded ? NoContent() : BadRequest(response);

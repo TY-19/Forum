@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CurrentUserService } from '../authentication/current-user.service';
 import { AuthenticationService } from '../authentication/authentication.service';
 
@@ -18,7 +18,7 @@ export class NavMenuComponent {
       return this.isAuthenticated;
   }
   constructor(private authService: AuthenticationService,
-    private currentUser: CurrentUserService) {
+    private router: Router) {
     
   }
 
@@ -34,5 +34,6 @@ export class NavMenuComponent {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/']);
   }
 }
