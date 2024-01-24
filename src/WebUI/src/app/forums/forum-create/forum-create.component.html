@@ -1,0 +1,61 @@
+<div class="py-4 m-2 flex text-center bg-amber-100">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-2">
+            <div>Name:</div>
+            <div class="mb-2">
+                <input type="text" formControlName="name">
+                @if(form.controls['name'].touched && form.controls['name'].errors) { 
+                    <p class="max-w-60">
+                        @if(form.controls['name'].errors['required']) {
+                            <span class="text-red-900">Name is required</span>
+                        }
+                        @if(form.controls['name'].errors['minlength']) {
+                            <span class="text-red-900">Name must be at least 3 characters long.</span>
+                        }
+                        @if(form.controls['name'].errors['maxlength']) {
+                            <span class="text-red-900">Name can be at most 100 characters long.</span>
+                        }
+                    </p>
+                }
+            </div>
+            <div>Create inside forum:</div>
+            <div class="mb-2">
+                <select formControlName="parentForumId" class="bg-white w-24">
+                    <option value="">-</option>
+                </select>
+            </div>
+            <div>Category:</div>
+            <div class="mb-2">
+                <input type="text" formControlName="category">
+                @if(form.controls['category'].touched && form.controls['category'].errors) { 
+                    <p class="max-w-60">
+                        @if(form.controls['category'].errors['maxlength']) {
+                            <span class="text-red-900">Category can be at most 50 characters long.</span>
+                        }
+                    </p>
+                }
+            </div>
+            <div>Description:</div>
+            <div>
+                <textarea type="text" formControlName="description" class="w-full">
+                </textarea>
+                @if(form.controls['description'].touched && form.controls['description'].errors) { 
+                    <p class="max-w-60">
+                        @if(form.controls['description'].errors['maxlength']) {
+                            <span class="text-red-900">Category can be at most 50 characters long.</span>
+                        }
+                    </p>
+                }
+            </div>
+        </div>
+        @if(serverError) {
+            <p class="text-red-900">{{serverError}}</p>
+        }
+        <button type="submit" class="button button-primary">
+            Save
+        </button>
+        <button type="button" [routerLink]="['/']" class="button button-secondary ml-4">
+            Cancel
+        </button>
+    </form>
+</div>

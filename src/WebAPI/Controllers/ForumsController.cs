@@ -54,7 +54,7 @@ public class ForumsController(IMediator mediator) : ControllerBase
 
         var response = await mediator.Send(command, cancellationToken);
         return response.Succeeded && response.Payload != null
-            ? CreatedAtAction(nameof(GetForum), new { id = response.Payload.Id }, response.Payload)
+            ? CreatedAtAction(nameof(GetForum), new { forumId = response.Payload.Id }, response.Payload)
             : BadRequest(response);
     }
 

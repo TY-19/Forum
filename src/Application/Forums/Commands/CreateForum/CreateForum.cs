@@ -3,6 +3,7 @@ using Forum.Application.Common.Models;
 using Forum.Application.Forums.Dtos;
 using Forum.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Forum.Application.Forums.Commands.CreateForum;
@@ -20,6 +21,9 @@ public class CreateForumCommandHandler(IForumDbContext context,
 {
     public async Task<CustomResponse<ForumDto>> Handle(CreateForumCommand command, CancellationToken cancellationToken)
     {
+        if(command.ParentForumId != null && !await context.Forums.AnyAsync(f => f.Id == command.ParentForumId, cancellationToken))
+            return new CustomResponse<ForumDto>() { Message = $"No forum with id {command.ParentForumId} exist" };
+
         ForumEntity forum = ToForumEntity(command);
 
         try
