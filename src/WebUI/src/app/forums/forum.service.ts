@@ -14,6 +14,11 @@ export class ForumService {
 
     }
     
+    getForums(): Observable<Forum> {
+        const url = baseUrl + "/api/forums";
+        return this.http.get<Forum>(url);
+    }
+
     createForum(forum: ForumCreate): Observable<HttpResponse<Forum>> {
         const url = baseUrl + "/api/forums";
         return this.http.post<Forum>(url, forum, { observe: 'response'});

@@ -11,5 +11,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  logoUrl: string = baseUrl + "/design/logo.png"
+  
 }

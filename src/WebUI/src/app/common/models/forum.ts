@@ -1,3 +1,6 @@
+import { Subforum } from "./subforum";
+import { TopicInForum } from "./topic-in-forum";
+
 export interface Forum {
     id: number,
     name: string,
@@ -7,6 +10,6 @@ export interface Forum {
     isClosed: boolean,
     isUnread: boolean,
     subcategories: string[],
-    subforums: [],
-    topics: []
+    subforums: Subforum[],
+    topics: TopicInForum[]
 }

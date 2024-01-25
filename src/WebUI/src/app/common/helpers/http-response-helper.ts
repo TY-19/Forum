@@ -8,8 +8,7 @@ export class HttpResponseHelper {
       for(let e of error.errors) {
         message += "\n" + e;
       }
-    } else
-    {
+    } else {
       for(let prop in error.errors) {
         message += "\n" + error.errors[prop];
       }

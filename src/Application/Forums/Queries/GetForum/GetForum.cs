@@ -20,10 +20,7 @@ public class GetForumRequestHandler(IForumDbContext context,
         ForumDto? forumDto;
         if (request.ForumId == null && request.ParentForumId == null)
         {
-            forumDto = new()
-            {
-                Subforums = await GetSubforumsAsync(request.ParentForumId, cancellationToken)
-            };
+            forumDto = await GetTopLevelForumAsync(cancellationToken);
         }
         else
         {
@@ -33,14 +30,21 @@ public class GetForumRequestHandler(IForumDbContext context,
         return await mediator.Send(new SetUnreadStatusCommand() { ForumDto = forumDto }, cancellationToken);
     }
 
-    private async Task<IEnumerable<SubforumDto>> GetSubforumsAsync(int? parentForumId, CancellationToken cancellationToken)
-        => await context.Forums
-            .Where(f => f.ParentForumId == parentForumId)
-            .Include(f => f.Subforums)
-            .Include(f => f.Topics)
-            .Select(f => new SubforumDto(f))
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+    private async Task<ForumDto> GetTopLevelForumAsync(CancellationToken cancellationToken)
+    {
+        var forum = new ForumDto
+        {
+            Subforums = await context.Forums
+                .Where(f => f.ParentForumId == null)
+                .Include(f => f.Subforums)
+                .Include(f => f.Topics)
+                .Select(f => new SubforumDto(f))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken),
+        };
+        forum.Subcategories = forum.Subforums.Select(sf => sf.Category).Distinct().ToList();
+        return forum;
+    }
 
     private async Task<ForumDto?> GetForumDtoAsync(int id, CancellationToken cancellationToken)
         => await context.Forums

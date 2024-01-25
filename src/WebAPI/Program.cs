@@ -30,8 +30,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseStaticFiles();
-
 app.UseExceptionHandler(_ => { });
 
 app.MapControllers();
