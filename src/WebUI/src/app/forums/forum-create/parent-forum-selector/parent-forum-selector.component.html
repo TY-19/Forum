@@ -1,0 +1,8 @@
+<select #selector formControlName="parentForumId" class="bg-white w-full">
+    <option value="">-</option>
+    @for(opt of options; track opt.id) {
+        <option [value]="opt.id">
+            {{getName(opt)}}
+        </option>
+    }
+</select>

@@ -20,9 +20,7 @@
             </div>
             <div>Create inside forum:</div>
             <div class="mb-2">
-                <select formControlName="parentForumId" class="bg-white w-24">
-                    <option value="">-</option>
-                </select>
+                <app-parent-forum-selector></app-parent-forum-selector>
             </div>
             <div>Category:</div>
             <div class="mb-2">
@@ -42,7 +40,7 @@
                 @if(form.controls['description'].touched && form.controls['description'].errors) { 
                     <p class="max-w-60">
                         @if(form.controls['description'].errors['maxlength']) {
-                            <span class="text-red-900">Category can be at most 50 characters long.</span>
+                            <span class="text-red-900">Description can be at most 500 characters long.</span>
                         }
                     </p>
                 }
