@@ -25,6 +25,11 @@ export class ForumService {
         return this.http.get<Forum>(url);
     }
 
+    getForum(forumId: number | string): Observable<Forum> {
+        const url = baseUrl + "/api/forums/" + forumId;
+        return this.http.get<Forum>(url);
+    }
+
     createForum(forum: ForumCreate): Observable<HttpResponse<Forum>> {
         let url = baseUrl + "/api/forums";
         if(forum.parentForumId) {

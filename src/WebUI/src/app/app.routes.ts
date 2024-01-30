@@ -13,5 +13,5 @@ export const routes: Routes = [
     { path: 'profile', component: AccountComponent },
     { path: 'forums/create', component: ForumCreateComponent },
     { path: 'forums', component: ForumsComponent },
-    { path: 'forums/:id', component: ForumViewComponent },
+    { path: 'forums/:forumId', component: ForumViewComponent },
 ];

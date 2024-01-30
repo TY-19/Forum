@@ -23,6 +23,9 @@
         <div class="m-4">
             <div class="bg-orange-300 text-center px-5 rounded-md border-solid border-teal-700 border-b-[1px]">
                 {{category}}
+                @if(category === "") {
+                    No category
+                }
             </div>
             <div class=" bg-amber-200 rounded-md">
                 @for(subforum of forums.get(category); track subforum.id) {
@@ -30,7 +33,9 @@
                         <div class="col-span-1" [class]="subforum.isUnread ? 'forum-unread-icon' : 'forum-read-icon'">
                         </div>
                         <div class="col-span-9">
-                            <p class="text-lg">{{subforum.name}}</p>
+                            <a [routerLink]="['/forums', subforum.id]" class="text-lg hover:underline">
+                                {{subforum.name}}
+                            </a>
                             <p class="text-sm text-gray-600">{{subforum.description}}</p>
                         </div>
                         <div class="col-span-1">
