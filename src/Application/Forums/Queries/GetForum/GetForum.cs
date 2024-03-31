@@ -37,6 +37,8 @@ public class GetForumRequestHandler(IForumDbContext context,
             Subforums = await context.Forums
                 .Where(f => f.ParentForumId == null)
                 .Include(f => f.Subforums)
+                    .ThenInclude(s => s.Subforums)
+                    .ThenInclude(s => s.Topics)
                 .Include(f => f.Topics)
                 .Select(f => new SubforumDto(f))
                 .AsNoTracking()
@@ -50,6 +52,8 @@ public class GetForumRequestHandler(IForumDbContext context,
         => await context.Forums
             .Where(f => f.Id == id)
             .Include(f => f.Subforums)
+                .ThenInclude(s => s.Subforums)
+                .ThenInclude(s => s.Topics)
             .Include(f => f.Topics)
             .Select(f => new ForumDto(f))
             .FirstOrDefaultAsync(cancellationToken);

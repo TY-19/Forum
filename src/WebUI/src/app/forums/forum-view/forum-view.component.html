@@ -1,17 +1,22 @@
-<div class="m-2 flex">
-    <div class="mx-2">
-        <button type="button" [routerLink]="['/forums', 'create']" class="button button-primary">
-            Create subforum
-        </button>
-    </div>
-    <div class="mx-2">
-        <button type="button" [routerLink]="['/forums', forum.id, 'topics', 'create']" class="button button-primary">
-            Create topic
-        </button>
-    </div>
-</div>
-
 @if(forum) {
+    <div class="mx-4 my-2 flex">
+        <div>
+            <button type="button" [routerLink]="['/forums', forum.id, 'update']" class="button button-primary">
+                Update forum
+            </button>
+        </div>
+        <div class="mx-2">
+            <button type="button" [routerLink]="['/forums', 'create']" class="button button-primary">
+                Create subforum
+            </button>
+        </div>
+        <div class="mx-2">
+            <button type="button" [routerLink]="['/forums', forum.id, 'topics', 'create']" class="button button-primary">
+                Create topic
+            </button>
+        </div>
+    </div>
+
     @if(forum.subforums && forum.subforums.length > 0) {
         <div class="mx-4 mt-4 bg-orange-300 text-center px-5 rounded-md border-solid border-teal-700 border-b-[1px]">
             Subforums

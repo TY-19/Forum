@@ -5,6 +5,7 @@ import { RegistrationComponent } from './authentication/registration/registratio
 import { AccountComponent } from './account/account.component';
 import { ForumCreateComponent } from './forums/forum-create/forum-create.component';
 import { ForumViewComponent } from './forums/forum-view/forum-view.component';
+import { ForumUpdateComponent } from './forums/forum-update/forum-update.component';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', component: ForumsComponent },
@@ -14,4 +15,5 @@ export const routes: Routes = [
     { path: 'forums/create', component: ForumCreateComponent },
     { path: 'forums', component: ForumsComponent },
     { path: 'forums/:forumId', component: ForumViewComponent },
+    { path: 'forums/:forumId/update', component: ForumUpdateComponent },
 ];
