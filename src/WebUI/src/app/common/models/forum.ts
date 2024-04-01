@@ -1,3 +1,4 @@
+import { Category } from "./category";
 import { Subforum } from "./subforum";
 import { TopicInForum } from "./topic-in-forum";
 
@@ -9,7 +10,7 @@ export interface Forum {
     description: string | null,
     isClosed: boolean,
     isUnread: boolean,
-    subcategories: string[],
+    subcategories: Category[],
     subforums: Subforum[],
     topics: TopicInForum[]
 }

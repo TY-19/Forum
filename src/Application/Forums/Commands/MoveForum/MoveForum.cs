@@ -12,6 +12,7 @@ public class MoveForumCommand : IRequest<CustomResponse>
     public int Id { get; set; }
     public int? OldParentForumId { get; set; }
     public int? NewParentForumId { get; set; }
+    public int? NewPosition { get; set; }
 }
 
 public class MoveForumCommandHandler(IForumDbContext context,
@@ -31,6 +32,12 @@ public class MoveForumCommandHandler(IForumDbContext context,
             return new CustomResponse() { Succeeded = false, Message = $"The forum with the id {command.Id} does not exist in the suggested forum" };
 
         forum.ParentForumId = command.NewParentForumId;
+
+        forum.Position = command.NewPosition ?? int.MaxValue;
+        var toMove = await context.Forums
+            .Where(f => f.ParentForumId == command.NewParentForumId && f.Position >= forum.Position)
+            .ToListAsync(cancellationToken);
+        toMove.ForEach(f => f.Position++);
 
         try
         {

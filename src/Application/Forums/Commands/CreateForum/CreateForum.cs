@@ -24,7 +24,28 @@ public class CreateForumCommandHandler(IForumDbContext context,
         if(command.ParentForumId != null && !await context.Forums.AnyAsync(f => f.Id == command.ParentForumId, cancellationToken))
             return new CustomResponse<ForumDto>() { Message = $"No forum with id {command.ParentForumId} exist" };
 
-        ForumEntity forum = ToForumEntity(command);
+        var categories = await context.Forums
+            .Include(f => f.Category)
+            .Where(f => f.ParentForumId == command.ParentForumId)
+            .Select(f => f.Category)
+            .ToListAsync(cancellationToken);
+        var category = categories
+            .Where(c => c != null && c.Name == command.Category)
+            .FirstOrDefault();
+        if(category == null && command.Category != null)
+        {
+            category = new Category()
+            {
+                Name = command.Category,
+                ParentForumId = command.ParentForumId,
+                Position = categories.Where(c => c != null)
+                    .Select(c => c!.Position)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1
+            };
+        }
+
+        ForumEntity forum = ToForumEntity(command, category);
 
         try
         {
@@ -40,12 +61,12 @@ public class CreateForumCommandHandler(IForumDbContext context,
         return new CustomResponse<ForumDto>() { Succeeded = true, Payload = ToForumDto(forum) };
     }
 
-    private static ForumEntity ToForumEntity(CreateForumCommand command)
+    private static ForumEntity ToForumEntity(CreateForumCommand command, Category? category)
         => new()
         {
             Name = command.Name,
             ParentForumId = command.ParentForumId,
-            Category = command.Category,
+            CategoryId = category?.Id,
             Description = command.Description,
         };
 
@@ -55,7 +76,7 @@ public class CreateForumCommandHandler(IForumDbContext context,
             Id = forum.Id,
             ParentForumId = forum.ParentForumId,
             Name = forum.Name,
-            Category = forum.Category,
+            Category = forum.Category?.Name,
             Description = forum.Description
         };
 }

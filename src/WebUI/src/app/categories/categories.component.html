@@ -1,0 +1,47 @@
+<div class="m-2">
+    <div class="bg-orange-500 grid grid-cols-12 m-4 px-2 rounded-md">
+        <div class="col-span-1">
+        </div>
+        <div class="col-span-9">
+            Forum
+        </div>
+        <div class="col-span-1">
+            Subforums
+        </div>
+        <div class="col-span-1">
+            Topics
+        </div>
+    </div>
+    @for(category of categories; track category) {
+        <div class="m-4">
+            <div class="bg-orange-300 text-center px-5 rounded-md border-solid border-teal-700 border-b-[1px]">
+                {{category.name}}
+                @if(category.name === "") {
+                    No category
+                }
+            </div>
+            <div class=" bg-amber-200 rounded-md">
+                @for(subforum of subforums.get(category.name); track subforum.id) {
+                    <div class="grid grid-cols-12 px-2 border-solid border-teal-700 border-b-[1px]">
+                        <div class="col-span-1" [class]="subforum.isUnread ? 'forum-unread-icon' : 'forum-read-icon'">
+                        </div>
+                        <div class="col-span-9">
+                            <a [routerLink]="['/forums', subforum.id]"
+                                (click)="reloadForum(subforum.id)"
+                                class="text-lg hover:underline">
+                                {{subforum.name}}
+                            </a>
+                            <p class="text-sm text-gray-600">{{subforum.description}}</p>
+                        </div>
+                        <div class="col-span-1">
+                            <p>{{subforum.subforumsCount}}</p>
+                        </div>
+                        <div class="col-span-1">
+                            <p>{{subforum.topicsCount}}</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

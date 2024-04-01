@@ -98,7 +98,8 @@ public class ForumsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult> MoveForum(int forumId, int? oldParent, int? newParent, CancellationToken cancellationToken)
+    public async Task<ActionResult> MoveForum(int forumId, int? oldParent, int? newParent,
+        int? position, CancellationToken cancellationToken)
     {
         if (!await CheckUserPermissionAsync(PermissionType.CanMoveForum, oldParent, cancellationToken)
             || !await CheckUserPermissionAsync(PermissionType.CanMoveForum, newParent, cancellationToken))
@@ -108,7 +109,8 @@ public class ForumsController(IMediator mediator) : ControllerBase
         {
             Id = forumId,
             OldParentForumId = oldParent,
-            NewParentForumId = newParent
+            NewParentForumId = newParent,
+            NewPosition = position
         };
 
         var response = await mediator.Send(command, cancellationToken);

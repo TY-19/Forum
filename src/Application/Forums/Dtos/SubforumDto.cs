@@ -9,6 +9,7 @@ public class SubforumDto
     public int? ParentForumId { get; set; }
     public string? Category { get; set; }
     public string? Description { get; set; }
+    public int Position { get; set; }
     public bool IsClosed { get; set; }
     public bool IsUnread { get; set; }
     public int SubforumsCount { get; set; }
@@ -21,7 +22,8 @@ public class SubforumDto
         Id = forum.Id;
         Name = forum.Name;
         ParentForumId = forum.ParentForumId;
-        Category = forum.Category;
+        Category = forum.Category?.Name;
+        Position = forum.Position;
         Description = forum.Description;
         IsClosed = forum.IsClosed;
         SubforumsCount = forum.Subforums.Count();

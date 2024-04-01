@@ -6,7 +6,9 @@ public class ForumEntity : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public int? ParentForumId { get; set; }
-    public string? Category { get; set; }
+    public int? CategoryId {get; set; }
+    public Category? Category { get; set; }
+    public int Position {get; set; }
     public string? Description { get; set; }
     public bool IsClosed { get; set; }
     public IEnumerable<ForumEntity> Subforums { get; set; } = new List<ForumEntity>();
