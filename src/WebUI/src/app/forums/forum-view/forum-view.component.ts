@@ -30,7 +30,7 @@ export class ForumViewComponent implements OnInit {
     this.forumId = id;
     this.getForum();
   }
-  
+
   private getForum(): void {
     this.forumService.getForum(this.forumId)
       .subscribe(response => {

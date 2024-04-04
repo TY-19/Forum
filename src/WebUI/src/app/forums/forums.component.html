@@ -1,3 +1,174 @@
+<div
+    (drop)="onDropCategory($event)"
+    (dragenter)="onDragEnterCategory($event, 'category-1')"
+    (dragover)="onDragOverCategory($event)"
+    id="category-1"
+    class="flex flex-col">
+    @if(dragOverCategoryId === "category-1" && isDraggingCategory) {
+        <div class="border-blue-950 border-b-[6px]"></div>
+    }
+    <div
+        draggable="true"
+        (dragstart)="onDragStartCategory($event)"
+        (dragend)="onDragEndCategory($event)"
+        (dragenter)="onDragEnterCategory($event, 'category-1')"
+        (dragover)="onDragOverCategory($event)"
+        id="category-title-1"
+        class="mx-auto border-solid border-blue-950 border-[2px]">
+            Category 1
+        </div>
+    <div 
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-1"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-1" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 1
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-2"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-2" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 2
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-3"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-3" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 3   
+    </div>
+    <div 
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-5"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-5" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 5
+    </div>
+    <div
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-last-1"
+        [ngClass]="isDraggingItem ? 'bg-yellow-200 border-blue-950' : 'bg-teal-700 border-teal-700'"
+        class="mx-auto h-6 w-12 border-[2px] cursor-grab">
+        @if(dragOverId === "item-last-1" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+    </div>
+</div>
+
+<div 
+    (drop)="onDropCategory($event)"
+    (dragenter)="onDragEnterCategory($event, 'category-2')"
+    (dragover)="onDragOverCategory($event)"
+    id="category-2"
+    class="flex flex-col border-pink-400 border-[2px]">
+    @if((dragOverCategoryId === "category-2") && isDraggingCategory) {
+        <div class="border-blue-950 border-b-[6px]"></div>
+    }
+    <div
+        draggable="true"
+        (dragstart)="onDragStartCategory($event)"
+        (dragend)="onDragEndCategory($event)"
+        (dragenter)="onDragEnterCategory($event, 'category-2')"
+        (dragover)="onDragOverCategory($event)"
+        id="category-title-2"
+        class="mx-auto border-solid border-blue-950 border-[2px]">
+        Category 2
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-4"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-4" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 4   
+    </div>
+    
+    <div 
+        draggable="true"
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-6"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-6" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 6
+    </div>
+    <div
+        (dragstart)="onDragStartItem($event)"
+        (dragenter)="onDragEnterItem($event)"
+        (dragover)="onDragOverItem($event)"
+        (dragleave)="onDragLeaveItem($event)"
+        (dragend)="onDragEndItem($event)"
+        (drop)="onDropItem($event)"
+        id="item-last-2"
+        [ngClass]="isDraggingItem ? 'bg-yellow-200 border-blue-950' : 'bg-teal-700 border-teal-700'"
+        class="mx-auto h-6 w-12  border-[2px] cursor-grab">
+        @if(dragOverId === "item-last-2" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+    </div>
+</div>
+<div 
+    (drop)="onDropCategory($event)"
+    (dragenter)="onDragEnterCategory($event, 'category-last')"
+    (dragover)="onDragOverCategory($event)"
+    id="category-last"
+    class="flex flex-col border-pink-400 border-[2px]">
+@if((dragOverCategoryId === "category-last") && isDraggingCategory) {
+    <div class="border-blue-950 border-b-[6px]"></div>
+}
+</div>
+
 <div class="mx-6 my-2">
     <div>
         <button type="button" [routerLink]="['forums', 'create']" class="button button-primary">
