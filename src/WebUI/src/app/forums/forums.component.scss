@@ -1,9 +1,7 @@
-.forum-unread-icon {
-    background-image: url("/assets/design/forum_unread_icon.png");
-    background-repeat: no-repeat;
+.drop-target {
+    @apply border-blue-950 border-b-[6px]
 }
 
-.forum-read-icon {
-    background-image: url("/assets/design/forum_read_icon.png");
-    background-repeat: no-repeat;
+.drop-space {
+    @apply bg-clip-padding shadow-[inset_0px_16px_0px_0px_rgb(15,118,110)]
 }

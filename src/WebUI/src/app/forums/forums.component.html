@@ -1,3 +1,222 @@
+@for(category of categories; track category) {
+    <div class="m-4"
+        (dragenter)="onDragEnter($event, category.id.toString())"
+        [id]="category.id">
+        @if(dragOverId === category.id.toString() && isDraggingCategory) {
+            <div class="drop-target"></div>
+        }
+
+        <div 
+            draggable="true"
+            (dragstart)="onDragStart($event, true)"
+            (dragend)="onDragEnd($event)"
+            (dragenter)="onDragEnter($event, category.id.toString())"
+            class="bg-orange-300 text-center px-5 rounded-md border-solid border-teal-700 border-b-[1px]">
+            {{category.name}}
+            @if(category.name === "") {
+                No category
+            }
+        </div>
+        @for(subforum of subforums.get(category.name); track subforum.id) {
+            <div
+                draggable="true"
+                (dragstart)="onDragStart($event, false, true)"
+                (dragenter)="onDragEnter($event, null)"
+                (dragend)="onDragEnd($event)"
+                [id]="subforum.id.toString()"
+                class=" bg-amber-200 rounded-md pt-4 drop-space">
+                @if(dragOverId === subforum.id.toString() && isDraggingItem) {
+                    <div class="drop-target"></div>
+                }
+
+                <div
+                    (dragenter)="onDragEnter($event, null)"
+                    (dragend)="onDragEnd($event)"
+                    class="grid grid-cols-12 px-2 border-solid border-teal-700 border-b-[1px]">
+                    <div draggable="false"
+                        class="col-span-1" [class]="subforum.isUnread ? 'forum-unread-icon' : 'forum-read-icon'">
+                    </div>
+                    <div 
+                        
+                        (dragenter)="onDragEnter($event, null)"
+                        (dragend)="onDragEnd($event)"
+                        class="col-span-9">
+                        <a draggable="false"
+                            [routerLink]="['/forums', subforum.id]"
+                            (click)="reloadForum(subforum.id)"
+                            class="text-lg hover:underline">
+                            {{subforum.name}}
+                        </a>
+                        <p class="text-sm text-gray-600">{{subforum.description}}</p>
+                    </div>
+                    <div class="col-span-1">
+                        <p>{{subforum.subforumsCount}}</p>
+                    </div>
+                    <div class="col-span-1">
+                        <p>{{subforum.topicsCount}}</p>
+                    </div>
+                </div>
+            </div>
+        }
+        <div
+            (dragenter)="onDragEnter($event, null)"
+            (dragend)="onDragEnd($event)"
+            [id]="'item-last-' + category.id.toString()"
+            class="mx-auto h-6 bg-teal-700">
+            @if(dragOverId === ("item-last-" + category.id.toString()) && isDraggingItem) {
+                <div class="drop-target"></div>
+            }
+        </div>
+    </div>
+}
+<div 
+    (dragenter)="onDragEnter($event, 'category-last')"
+    id="category-last"
+    class="flex flex-col">
+    @if((dragOverId === "category-last") && isDraggingCategory) {
+        <div class="drop-target"></div>
+    }
+</div>
+
+<div
+    (dragenter)="onDragEnter($event, 'category-1')"
+    id="category-1"
+    class="flex flex-col">
+    @if(dragOverId === "category-1" && isDraggingCategory) {
+        <div class="border-blue-950 border-b-[6px]"></div>
+    }
+    <div
+        draggable="true"
+        (dragstart)="onDragStart($event, true)"
+        (dragend)="onDragEnd($event)"
+        (dragenter)="onDragEnter($event, 'category-1')"
+        id="category-title-1"
+        class="mx-auto border-solid border-blue-950 border-[2px]">
+            Category 1
+        </div>
+    <div 
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        
+        id="item-1"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-1" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 1
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-2"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-2" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 2
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-3"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-3" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 3   
+    </div>
+    <div 
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-5"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-5" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 5
+    </div>
+    <div
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-last-1"
+        [ngClass]="isDraggingItem ? 'bg-yellow-200 border-blue-950' : 'bg-teal-700 border-teal-700'"
+        class="mx-auto h-6 w-12 border-[2px] cursor-grab">
+        @if(dragOverId === "item-last-1" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+    </div>
+</div>
+
+<div 
+    (dragenter)="onDragEnter($event, 'category-2')"
+    id="category-2"
+    class="flex flex-col border-pink-400 border-[2px]">
+    @if((dragOverId === "category-2") && isDraggingCategory) {
+        <div class="border-blue-950 border-b-[6px]"></div>
+    }
+    <div
+        draggable="true"
+        (dragstart)="onDragStart($event, true)"
+        (dragend)="onDragEnd($event)"
+        (dragenter)="onDragEnter($event, 'category-1')"
+        id="category-title-2"
+        class="mx-auto border-solid border-blue-950 border-[2px]">
+        Category 2
+    </div>
+    <div
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-4"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-4" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 4   
+    </div>
+    
+    <div 
+        draggable="true"
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-6"
+        class="mx-auto bg-yellow-400 border-blue-950 border-[2px] cursor-grab">
+        @if(dragOverId === "item-6" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+        Item 6
+    </div>
+    <div
+        (dragstart)="onDragStart($event, false, true)"
+        (dragenter)="onDragEnter($event, null)"
+        (dragend)="onDragEnd($event)"
+        id="item-last-2"
+        [ngClass]="isDraggingItem ? 'bg-yellow-200 border-blue-950' : 'bg-teal-700 border-teal-700'"
+        class="mx-auto h-6 w-12  border-[2px] cursor-grab">
+        @if(dragOverId === "item-last-2" && isDraggingItem) {
+            <div class="border-blue-950 border-b-[6px]"></div>
+        }
+    </div>
+</div>
+<div 
+    (dragenter)="onDragEnter($event, 'category-last')"
+    id="category-last"
+    class="flex flex-col border-pink-400 border-[2px]">
+@if((dragOverId === "category-last") && isDraggingCategory) {
+    <div class="border-blue-950 border-b-[6px]"></div>
+}
+</div>
+
 <div class="mx-6 my-2">
     <div>
         <button type="button" [routerLink]="['forums', 'create']" class="button button-primary">
